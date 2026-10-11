@@ -207,26 +207,6 @@ img {
   color: var(--muted);
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: none;
-  color: var(--fg);
-  font: inherit;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.btn:hover {
-  background-color: var(--hover);
-}
-
 .toast {
   position: fixed;
   left: 50%;
@@ -842,17 +822,6 @@ img {
   margin: 2px 0 0;
   font-size: 15px;
   color: var(--muted);
-}
-
-.resume-actions {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 24px;
-}
-
-.resume-actions .btn {
-  height: 40px;
-  padding: 0 16px;
 }
 
 /* ---------- Portfolio ---------- */

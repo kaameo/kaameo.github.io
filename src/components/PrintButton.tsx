@@ -2,11 +2,10 @@
 
 import { PrinterIcon } from "./Icons";
 
-export default function PrintButton({ label }: { label: string }) {
+export default function PrintButton() {
   return (
-    <button type="button" className="btn no-print" onClick={() => window.print()}>
+    <button type="button" className="icon-btn no-print" onClick={() => window.print()} aria-label="인쇄" title="인쇄">
       <PrinterIcon />
-      {label}
     </button>
   );
 }

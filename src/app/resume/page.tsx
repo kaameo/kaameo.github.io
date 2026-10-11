@@ -12,7 +12,7 @@ export default function ResumePage() {
       <header className="resume-header">
         <div className="resume-title-row">
           <h1 className="page-title">{resume.name}</h1>
-          <PrintButton label="인쇄" />
+          <PrintButton />
         </div>
         <p className="resume-intro">{resume.intro}</p>
         <div className="resume-contact">
@@ -86,10 +86,6 @@ export default function ResumePage() {
           ))}
         </div>
       </section>
-
-      <div className="resume-actions no-print">
-        <PrintButton label="PDF로 저장" />
-      </div>
     </div>
   );
 }
