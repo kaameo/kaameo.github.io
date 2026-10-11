@@ -701,6 +701,20 @@ img {
   color: var(--muted);
 }
 
+.resume-intro p {
+  margin: 0;
+}
+
+.resume-intro strong {
+  color: var(--fg);
+}
+
+.resume-intro a,
+.job li a,
+.resume-project a {
+  color: var(--accent);
+}
+
 .resume-contact {
   display: flex;
   flex-wrap: wrap;

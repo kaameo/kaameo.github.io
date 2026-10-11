@@ -1,8 +1,8 @@
-// 사이트 전역 설정. [대괄호]로 된 값은 실제 내용으로 바꿔 주세요.
+// 사이트 전역 설정.
 export const site = {
   title: "kaameo.log",
   url: "https://kaameo.github.io",
-  author: "kaameo",
+  author: "홍진수",
   description: "백엔드 배운 것들을 기록합니다.",
   github: "https://github.com/kaameo",
   email: "kaameo12@gmail.com",
@@ -10,15 +10,15 @@ export const site = {
 
   hero: {
     greeting: "안녕하세요, 홍진수입니다.",
-    intro: "[한 줄 소개: 어떤 문제를 풀어온 개발자인지, 요즘 관심 있는 것]",
+    intro: "보안 로그 수집 플랫폼을 만들며 데이터 정합성과 장애 복구를 고민해 온 백엔드 엔지니어입니다. 요즘은 분산 시스템과 Kubernetes 운영에 관심이 많습니다.",
   },
 
   about: {
-    body: "[자기소개 2~3문장: 어떤 개발자인지, 어떤 일을 할 때 즐거운지, 일할 때 중요하게 생각하는 것]",
+    body: "백엔드와 인프라를 함께 다루는 엔지니어입니다.",
     items: [
-      { label: "Now", value: "[회사명]에서 [직무]로 일하고 있습니다." },
-      { label: "Interests", value: "[요즘 관심 있는 기술이나 주제]" },
-      { label: "Contact", value: "[email@example.com]", mono: true },
+      { label: "Now", value: "백엔드 엔지니어로 새로운 기회를 찾고 있습니다." },
+      { label: "Interests", value: "분산 시스템, 데이터 파이프라인, AI 도구를 활용한 개발 생산성" },
+      { label: "Contact", value: "kaameo12@gmail.com", mono: true },
     ],
   },
 

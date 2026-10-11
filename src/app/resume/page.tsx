@@ -2,11 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PrintButton from "@/components/PrintButton";
 import { resume } from "@/data/resume";
+import { renderInlineMarkdown, renderMarkdown } from "@/lib/markdown";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Resume" };
 
-export default function ResumePage() {
+// 소개는 여러 문단 마크다운, 경력 항목과 프로젝트 설명은 한 줄 마크다운으로 그린다.
+export default async function ResumePage() {
+  const intro = await renderMarkdown(resume.intro);
+  const experience = await Promise.all(
+    resume.experience.map(async (job) => ({ ...job, items: await Promise.all(job.items.map(renderInlineMarkdown)) })),
+  );
+  const projects = await Promise.all(
+    resume.projects.map(async (project) => ({ ...project, description: await renderInlineMarkdown(project.description) })),
+  );
+
   return (
     <div className="resume">
       <header className="resume-header">
@@ -14,10 +24,11 @@ export default function ResumePage() {
           <h1 className="page-title">{resume.name}</h1>
           <PrintButton />
         </div>
-        <p className="resume-intro">{resume.intro}</p>
+        <div className="resume-intro">{intro}</div>
         <div className="resume-contact">
           <span>{site.email}</span>
           <a href={site.github}>GitHub ↗</a>
+          <a href={resume.linkedin}>LinkedIn ↗</a>
           <Link href="/posts/">Blog</Link>
         </div>
       </header>
@@ -25,7 +36,7 @@ export default function ResumePage() {
       <section className="resume-section">
         <h2>Experience</h2>
         <div className="resume-stack">
-          {resume.experience.map((job, i) => (
+          {experience.map((job, i) => (
             <div key={i} className="job">
               <div className="job-top">
                 <h3>{job.company}</h3>
@@ -63,7 +74,7 @@ export default function ResumePage() {
       <section className="resume-section">
         <h2>Projects</h2>
         <div className="resume-stack tight">
-          {resume.projects.map((project) => (
+          {projects.map((project) => (
             <div key={project.title} className="resume-project">
               <h3>{project.title}</h3>
               <p>{project.description}</p>
@@ -82,6 +93,18 @@ export default function ResumePage() {
             <div key={edu.school} className="job-top">
               <strong>{edu.school}</strong>
               <span className="period">{edu.period}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="resume-section">
+        <h2>Certifications</h2>
+        <div className="resume-stack tight">
+          {resume.certifications.map((cert) => (
+            <div key={cert.name} className="job-top">
+              <strong>{cert.name}</strong>
+              <span className="period">{cert.date}</span>
             </div>
           ))}
         </div>
