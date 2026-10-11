@@ -35,7 +35,6 @@ export default function HomePage() {
         <div className="section-head">
           <h2 id="about">About</h2>
         </div>
-        <p className="about-body">{site.about.body}</p>
         <dl className="kv-list">
           {site.about.items.map((item) => (
             <div key={item.label} className="kv-row">

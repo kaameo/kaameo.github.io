@@ -14,7 +14,6 @@ export const site = {
   },
 
   about: {
-    body: "백엔드와 인프라를 함께 다루는 엔지니어입니다.",
     items: [
       { label: "Now", value: "백엔드 엔지니어로 새로운 기회를 찾고 있습니다." },
       { label: "Interests", value: "분산 시스템, 데이터 파이프라인, AI 도구를 활용한 개발 생산성" },

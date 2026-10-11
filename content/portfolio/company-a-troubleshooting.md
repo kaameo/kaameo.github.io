@@ -1,6 +1,6 @@
 ---
 title: "[트러블슈팅 제목]"
-company: company-a
+company: inbridge
 type: troubleshooting
 order: 10
 summary: "[문제와 해결을 한 줄로, 전후 수치 포함]"

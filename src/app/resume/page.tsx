@@ -54,6 +54,21 @@ export default async function ResumePage() {
       </section>
 
       <section className="resume-section">
+        <h2>Projects</h2>
+        <div className="resume-stack tight">
+          {projects.map((project) => (
+            <div key={project.title} className="resume-project">
+              <h3>{project.title}</h3>
+              <p>{project.description}</p>
+            </div>
+          ))}
+          <Link href="/portfolio/" className="accent-link no-print">
+            Portfolio에서 전체 보기 →
+          </Link>
+        </div>
+      </section>
+
+      <section className="resume-section">
         <h2>Skills</h2>
         <div className="resume-stack tight">
           {resume.skills.map((row) => (
@@ -68,21 +83,6 @@ export default async function ResumePage() {
               </div>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="resume-section">
-        <h2>Projects</h2>
-        <div className="resume-stack tight">
-          {projects.map((project) => (
-            <div key={project.title} className="resume-project">
-              <h3>{project.title}</h3>
-              <p>{project.description}</p>
-            </div>
-          ))}
-          <Link href="/portfolio/" className="accent-link no-print">
-            Portfolio에서 전체 보기 →
-          </Link>
         </div>
       </section>
 
