@@ -1,22 +1,10 @@
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
+// GitHub Pages는 정적 파일만 서빙하므로 out/ 폴더로 내보낸다.
 const nextConfig: NextConfig = {
-  output: 'export',
-  images: {
-    unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'img.shields.io',
-      },
-      {
-        protocol: 'https',
-        hostname: 'github-readme-stats.vercel.app',
-      },
-    ],
-  },
+  output: "export",
   trailingSlash: true,
-  transpilePackages: ['next-mdx-remote', 'mermaid'],
-}
+  images: { unoptimized: true },
+};
 
-export default nextConfig
+export default nextConfig;

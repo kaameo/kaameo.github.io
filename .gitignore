@@ -1,64 +1,15 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-.claude
-*.pem
-.serena/
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env
-.env*.local
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
+node_modules/
+.next/
+out/
 next-env.d.ts
+*.tsbuildinfo
+.DS_Store
 
-# guide
-BLOG_CONTENT_GUIDE.md
+# 로그
+*.log
 
-# itsme
-*/itsme.ko.md
-*/itsme.en.md
+# 환경 변수 (비밀값)
+.env*
 
-.env.local.example
-
-content/posts-backup/
-
-lib/mdx.ts.backup
-
-# Personal interview prep docs
-docs/FRONTEND_INTERVIEW_QUESTIONS.md
-
-.playwright-mcp/
-
-# oh-my-claudecode
-.omc/
-
-# agents skills
-.agents/
-
+# Claude Code 개인 설정 (launch.json 등 공용 설정은 커밋)
+.claude/settings.local.json
