@@ -159,6 +159,13 @@ img {
   display: none;
 }
 
+/* 테마 전환: 기본 크로스페이드를 끄고 ThemeToggle이 새 화면에 원형 clip-path를 입힌다 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 /* ---------- Layout ---------- */
 .page {
   padding-block: 56px 48px;
