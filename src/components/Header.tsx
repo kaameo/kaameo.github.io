@@ -10,6 +10,7 @@ const NAV = [
   { href: "/posts/", label: "Post", match: "/posts" },
   { href: "/resume/", label: "Resume", match: "/resume" },
   { href: "/portfolio/", label: "Portfolio", match: "/portfolio" },
+  { href: "/books/", label: "Book", match: "/books" },
 ];
 
 export default function Header() {

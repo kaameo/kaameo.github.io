@@ -346,6 +346,68 @@ img {
   text-underline-offset: 3px;
 }
 
+/* Books 바로가기 */
+.home-books {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.home-books-label {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.home-books:hover .home-books-label {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cover-stack {
+  display: flex;
+  align-items: flex-end;
+  height: 84px;
+  padding-left: 8px;
+}
+
+.cover-stack img {
+  height: 76px;
+  width: auto;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  transform-origin: 50% 100%;
+  transition: transform 0.25s ease;
+}
+
+.cover-stack img + img {
+  margin-left: -34px;
+}
+
+.cover-stack img:nth-child(1) {
+  transform: rotate(-8deg);
+}
+
+.cover-stack img:nth-child(2) {
+  transform: rotate(-2deg);
+}
+
+.cover-stack img:nth-child(3) {
+  transform: rotate(4deg);
+}
+
+.home-books:hover .cover-stack img:nth-child(1) {
+  transform: translateX(-10px) rotate(-14deg);
+}
+
+.home-books:hover .cover-stack img:nth-child(2) {
+  transform: rotate(-3deg);
+}
+
+.home-books:hover .cover-stack img:nth-child(3) {
+  transform: translateX(12px) rotate(10deg);
+}
+
 /* ---------- Post list ---------- */
 .list-head {
   display: flex;
@@ -1039,6 +1101,114 @@ img {
   line-height: 1.45;
 }
 
+/* ---------- Books ---------- */
+.book-grid {
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 40px 28px;
+}
+
+.book-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 표지 비율이 달라도 아랫선이 맞도록 책장처럼 바닥에 붙인다. */
+.book-cover {
+  aspect-ratio: 3 / 4;
+  min-height: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.book-cover img,
+.book-header-cover {
+  display: block;
+  border-radius: 2px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.book-cover img {
+  max-width: 100%;
+  max-height: 100%;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.book-card:hover .book-cover img {
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 12px 24px rgba(0, 0, 0, 0.16);
+}
+
+.book-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.book-author {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.book-header {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  align-items: end;
+  gap: 32px;
+  margin-bottom: 56px;
+}
+
+.book-header-cover {
+  width: 100%;
+  height: auto;
+}
+
+.book-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book-header-info h1 {
+  margin: 0 0 4px;
+  font-size: 32px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.book-header-author {
+  font-size: 16px;
+}
+
+.book-header-date {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.book-header-info a {
+  width: fit-content;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.book-header-info a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* ---------- 404 ---------- */
 .notfound {
   min-height: 60vh;
@@ -1156,6 +1326,24 @@ img {
 
   .pager .pager-next {
     grid-column: 1;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 28px 16px;
+  }
+
+  .book-header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .book-header-cover {
+    width: 140px;
+  }
+
+  .book-header-info h1 {
+    font-size: 26px;
   }
 }
 

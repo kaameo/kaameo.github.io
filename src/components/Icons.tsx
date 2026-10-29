@@ -60,7 +60,6 @@ export function PrinterIcon({ size = 16, className }: IconProps) {
     </svg>
   );
 }
-
 export function ChevronIcon({ direction, size = 16 }: { direction: "left" | "right"; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" {...stroke} aria-hidden="true">

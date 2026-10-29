@@ -3,6 +3,7 @@ import path from "node:path";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { getAllPosts } from "@/lib/posts";
+import { getAllBooks } from "@/lib/books";
 import { formatDot } from "@/lib/date";
 
 // public/profile.jpg를 넣으면 사진이 보이고, 없으면 자리 표시가 나온다.
@@ -10,6 +11,8 @@ const hasProfilePhoto = fs.existsSync(path.join(process.cwd(), "public", "profil
 
 export default function HomePage() {
   const recent = getAllPosts().slice(0, 3);
+  // 겹쳐 쌓을 때 최신 책이 맨 앞(오른쪽)에 오도록 뒤집는다.
+  const covers = getAllBooks().slice(0, 3).reverse();
 
   return (
     <div className="home">
@@ -56,6 +59,17 @@ export default function HomePage() {
             <span>{post.title}</span>
           </Link>
         ))}
+      </section>
+
+      <section aria-label="Books">
+        <Link href="/books/" className="home-books">
+          <span className="cover-stack" aria-hidden="true">
+            {covers.map((book) => (
+              <img key={book.slug} src={book.cover} alt="" />
+            ))}
+          </span>
+          <span className="home-books-label">Books →</span>
+        </Link>
       </section>
     </div>
   );

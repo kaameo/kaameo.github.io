@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "pnpm dlx serve out",
     "typecheck": "tsc --noEmit",
-    "new": "node scripts/new-post.mjs"
+    "new:post": "node scripts/new-post.mjs",
+    "new:book": "node scripts/new-book.mjs"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",

@@ -1,11 +1,11 @@
-// 새 글 뼈대를 만든다: pnpm new <글-주소> [제목]
+// 새 글 뼈대를 만든다: pnpm new:post <글-주소> [제목]
 import { existsSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const [slugArg, ...titleWords] = process.argv.slice(2);
 
 if (!slugArg) {
-  console.error('사용법: pnpm new <글-주소> ["글 제목"]');
+  console.error('사용법: pnpm new:post <글-주소> ["글 제목"]');
   process.exit(1);
 }
 
