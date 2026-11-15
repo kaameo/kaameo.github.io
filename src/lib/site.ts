@@ -13,14 +13,6 @@ export const site = {
     intro: "보안 로그 수집 플랫폼을 만들며 데이터 정합성과 장애 복구를 고민해 온 백엔드 엔지니어입니다. 요즘은 분산 시스템과 Kubernetes 운영에 관심이 많습니다.",
   },
 
-  about: {
-    items: [
-      { label: "Now", value: "백엔드 엔지니어로 새로운 기회를 찾고 있습니다." },
-      { label: "Interests", value: "분산 시스템, 데이터 파이프라인, AI 도구를 활용한 개발 생산성" },
-      { label: "Contact", value: "kaameo12@gmail.com", mono: true },
-    ],
-  },
-
   // GA4 측정 ID. 배포 워크플로가 저장소 secret에서 넣어 주고, 로컬 개발에서는 비어 있어 수집하지 않는다.
   gaId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "",
 

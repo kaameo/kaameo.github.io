@@ -34,20 +34,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="about">
-        <div className="section-head">
-          <h2 id="about">About</h2>
-        </div>
-        <dl className="kv-list">
-          {site.about.items.map((item) => (
-            <div key={item.label} className="kv-row">
-              <dt>{item.label}</dt>
-              <dd className={item.mono ? "mono" : undefined}>{item.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
       <section aria-labelledby="recent-posts">
         <div className="section-head">
           <h2 id="recent-posts">최근 글</h2>

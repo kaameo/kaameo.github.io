@@ -302,11 +302,6 @@ img {
   object-fit: cover;
 }
 
-.kv-list {
-  margin: 0;
-}
-
-.kv-row,
 .compact-item {
   display: grid;
   grid-template-columns: 92px minmax(0, 1fr);
@@ -314,21 +309,11 @@ img {
   border-bottom: 1px solid var(--line);
 }
 
-.kv-row {
-  padding: 12px 0;
-}
-
-.kv-row dt,
 .compact-item time {
   padding-top: 2px;
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--muted);
-}
-
-.kv-row dd {
-  margin: 0;
-  font-size: 15px;
 }
 
 .compact-item {
