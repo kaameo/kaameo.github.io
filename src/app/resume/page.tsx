@@ -2,21 +2,42 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactElement } from "react";
 import { DownloadIcon } from "@/components/Icons";
-import { resume } from "@/data/resume";
+import { resume, type Bullet } from "@/data/resume";
 import { renderInlineMarkdown, renderMarkdown } from "@/lib/markdown";
+import { getCase } from "@/lib/portfolio";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Resume" };
 
 type Entry = (typeof resume.education)[number];
+type RenderedBullet = { text: ReactElement; caseSlug?: string };
 
-const inline = (items: string[]) => Promise.all(items.map(renderInlineMarkdown));
+// Case가 있는 불릿은 Portfolio 상세 페이지로 잇는다. 없는 Case를 가리키면 빌드를 멈춘다.
+function renderBullets(items: Bullet[]): Promise<RenderedBullet[]> {
+  return Promise.all(
+    items.map(async (item) => {
+      if (typeof item === "string") return { text: await renderInlineMarkdown(item) };
+      if (!getCase(item.case)) throw new Error(`src/data/resume.ts: Case "${item.case}"가 content/portfolio에 없습니다.`);
+      return { text: await renderInlineMarkdown(item.text), caseSlug: item.case };
+    }),
+  );
+}
 
-function Bullets({ items }: { items: ReactElement[] }) {
+function Bullets({ items }: { items: RenderedBullet[] }) {
   return (
     <ul className="resume-bullets">
       {items.map((item, i) => (
-        <li key={i}>{item}</li>
+        <li key={i}>
+          {item.text}
+          {item.caseSlug && (
+            <>
+              {" "}
+              <Link href={`/portfolio/${item.caseSlug}/`} className="case-link no-print">
+                자세히 →
+              </Link>
+            </>
+          )}
+        </li>
       ))}
     </ul>
   );
@@ -28,16 +49,16 @@ function Entries({ entries }: { entries: Entry[] }) {
     <div className="resume-entries">
       {entries.map((entry) => (
         <div key={entry.name} className="resume-entry">
-          <div className="resume-item-head">
+          <div className="item-head">
             <h3>
               {entry.name}
-              <span className="resume-sub">{entry.subtitle}</span>
+              <span className="item-sub">{entry.subtitle}</span>
             </h3>
             <span className="period">{entry.period}</span>
           </div>
           {entry.detail && <p className="resume-entry-detail">{entry.detail}</p>}
           {entry.link && (
-            <p className="resume-entry-detail resume-links">
+            <p className="resume-entry-detail item-links">
               <a href={entry.link.href}>{entry.link.label} ↗</a>
             </p>
           )}
@@ -56,7 +77,9 @@ export default async function ResumePage() {
       products: await Promise.all(
         job.products.map(async (product) => ({
           ...product,
-          works: await Promise.all(product.works.map(async (work) => ({ ...work, items: await inline(work.items) }))),
+          works: await Promise.all(
+            product.works.map(async (work) => ({ ...work, items: await renderBullets(work.items) })),
+          ),
         })),
       ),
     })),
@@ -65,7 +88,7 @@ export default async function ResumePage() {
     resume.projects.map(async (project) => ({
       ...project,
       intro: await renderMarkdown(project.intro),
-      items: await inline(project.items),
+      items: await renderBullets(project.items),
     })),
   );
 
@@ -88,19 +111,24 @@ export default async function ResumePage() {
         </div>
       </header>
 
-      <section className="resume-section">
+      <section className="titled-section">
         <h2>Summary</h2>
         <div className="resume-summary">{summary}</div>
       </section>
 
-      <section className="resume-section">
-        <h2>Experience</h2>
+      <section className="titled-section">
+        <div className="titled-section-head">
+          <h2>Experience</h2>
+          <p className="title-meta">
+            자세한 내용은 <Link href="/portfolio/">포트폴리오</Link>를 참고해 주세요.
+          </p>
+        </div>
         {experience.map((job) => (
           <div key={`${job.company} ${job.role}`} className="resume-item">
-            <div className="resume-item-head">
+            <div className="item-head">
               <h3>
                 {job.company}
-                <span className="resume-sub">{job.role}</span>
+                <span className="item-sub">{job.role}</span>
               </h3>
               <span className="period">{job.period}</span>
             </div>
@@ -125,17 +153,17 @@ export default async function ResumePage() {
         ))}
       </section>
 
-      <section className="resume-section">
+      <section className="titled-section">
         <h2>Projects</h2>
         {projects.map((project) => (
           <div key={project.title} className="resume-item resume-project">
-            <div className="resume-item-head">
-              <div className="resume-title-line">
+            <div className="item-head">
+              <div className="item-title-line">
                 <h3>
                   {project.title}
-                  <span className="resume-sub">{project.subtitle}</span>
+                  <span className="item-sub">{project.subtitle}</span>
                 </h3>
-                <span className="resume-links">
+                <span className="item-links">
                   {project.links.map((link) => (
                     <a key={link.href} href={link.href}>
                       {link.label} ↗
@@ -151,7 +179,7 @@ export default async function ResumePage() {
         ))}
       </section>
 
-      <section className="resume-section">
+      <section className="titled-section">
         <h2>Skills</h2>
         <div className="skill-list">
           {resume.skills.map((row) => (
@@ -169,12 +197,12 @@ export default async function ResumePage() {
         </div>
       </section>
 
-      <section className="resume-section">
+      <section className="titled-section">
         <h2>Education</h2>
         <Entries entries={resume.education} />
       </section>
 
-      <section className="resume-section">
+      <section className="titled-section">
         <h2>ETC</h2>
         <Entries entries={resume.etc} />
       </section>

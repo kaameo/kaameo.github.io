@@ -643,6 +643,20 @@ img {
   border: 1px solid var(--line);
 }
 
+/* 한 문단에 이미지를 붙여 쓰면(![a](x) ![b](y)) 나란히 놓는다. 높이를 고정하지 않고 최대 높이만 둬서
+   폭이 모자라도 비율이 유지되고, 원본이 360px보다 큰 이미지끼리는 높이가 같아진다. 좁은 화면에서는 위아래로 쌓는다. */
+.prose p:has(> img + img) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.prose p:has(> img + img) > img {
+  width: auto;
+  height: auto;
+  max-height: 360px;
+}
+
 .prose hr {
   margin: 48px 0;
   border: 0;
@@ -806,16 +820,16 @@ img {
 .resume-contact a,
 .resume-summary a,
 .resume-bullets a,
-.resume-links a {
+.item-links a {
   color: var(--accent);
 }
 
 /* 섹션 제목을 내용 위에 두고, 제목 아래 가로줄로 섹션을 나눈다. */
-.resume-section {
+.titled-section {
   padding-top: 48px;
 }
 
-.resume-section h2 {
+.titled-section h2 {
   margin: 0 0 24px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--line);
@@ -823,6 +837,41 @@ img {
   font-weight: 700;
   line-height: 1.35;
   letter-spacing: -0.015em;
+}
+
+/* 제목 오른쪽에 회색 안내(Experience → Portfolio)를 둘 때는 둘을 한 줄로 묶고, 가로줄과 간격은 줄이 맡는다.
+   안내를 h2 밖에 둬야 스크린 리더와 목차에서 제목이 "Experience"로만 읽힌다. */
+.titled-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 16px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.titled-section-head h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.title-meta {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.title-meta a {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* 본문 글씨는 Summary, 불릿, 프로젝트 소개, Education·ETC 아래 줄 모두 15px로 맞춘다 (resume.html은 모두 10pt). */
+.resume-summary {
+  font-size: 15px;
 }
 
 .resume-summary p {
@@ -841,7 +890,7 @@ img {
 }
 
 /* 이름은 왼쪽, 기간은 오른쪽. 폭이 좁으면 기간이 아래 줄로 내려간다. */
-.resume-item-head {
+.item-head {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -849,27 +898,27 @@ img {
   gap: 2px 16px;
 }
 
-.resume-item-head h3 {
+.item-head h3 {
   margin: 0;
   font-size: 17px;
   font-weight: 600;
 }
 
-.resume-sub {
+.item-sub {
   margin-left: 8px;
   font-size: 14px;
   font-weight: 400;
   color: var(--muted);
 }
 
-.resume-title-line {
+.item-title-line {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 2px 14px;
 }
 
-.resume-links {
+.item-links {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 0 12px;
@@ -917,6 +966,18 @@ img {
   flex-direction: column;
   gap: 4px;
   font-size: 15px;
+}
+
+/* Case가 있는 불릿 끝에 붙는 Portfolio 상세 링크 */
+.case-link {
+  font-size: 13px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.case-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .resume-intro {
@@ -975,107 +1036,76 @@ img {
 }
 
 /* ---------- Portfolio ---------- */
-.group {
-  margin-top: 48px;
-  padding-top: 32px;
+/* Project마다 개요와 Case 제목 불릿을 두고, Case 하나가 상세 페이지 하나다.
+   섹션 제목, 이름·기간 줄은 Resume와 같은 규칙(.titled-section, .item-head)을 쓴다. */
+.pf-project {
+  scroll-margin-top: 24px;
+}
+
+.pf-project + .pf-project {
+  margin-top: 40px;
+  padding-top: 40px;
   border-top: 1px solid var(--line);
 }
 
-.group-head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 4px 16px;
-  margin-bottom: 8px;
-}
-
-.group-head h2 {
-  margin: 0;
-  font-size: 22px;
-  line-height: 1.4;
-  letter-spacing: -0.015em;
-}
-
-.project {
+.pf-overview {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--line);
+  gap: 6px;
+  margin: 14px 0 0;
+  font-size: 15px;
 }
 
-.project-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
+.pf-overview > div {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 12px;
 }
 
-.project h3 {
-  margin: 0;
-  font-size: 18px;
+.pf-overview dt {
   font-weight: 600;
-  line-height: 1.45;
+  color: var(--muted);
+}
+
+.pf-overview dd {
+  margin: 0;
+}
+
+.pf-cases {
+  margin: 18px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+}
+
+.pf-cases li::marker {
+  color: var(--muted);
+}
+
+.pf-cases a {
+  font-weight: 600;
   transition: color 0.15s ease;
 }
 
-.project:hover h3 {
+.pf-cases a:hover {
   color: var(--accent);
+}
+
+.pf-cases .arrow {
+  display: inline-block;
+  margin-left: 6px;
+  transition: transform 0.15s ease;
+}
+
+.pf-cases a:hover .arrow {
+  transform: translateX(3px);
 }
 
 .arrow {
   flex: none;
   color: var(--accent);
-}
-
-.tech {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.project ul {
-  margin: 10px 0 0;
-  padding-left: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 15px;
-  line-height: 1.65;
-}
-
-.troubles {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-}
-
-.troubles h3 {
-  margin: 0 0 4px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.troubles a {
-  display: flex;
-  flex-direction: column;
-  padding: 10px 0;
-}
-
-.trouble-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--accent);
-}
-
-.trouble-summary {
-  font-size: 14px;
-  color: var(--muted);
 }
 
 .back-link {
@@ -1100,9 +1130,15 @@ img {
 }
 
 .pd-kicker {
+  margin: 0;
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--muted);
+}
+
+/* 어느 Project의 Case인지: 프로젝트 이름은 본문색, 소속은 회색 */
+.pd-kicker-project {
+  color: var(--fg);
 }
 
 .pd-header h1 {
@@ -1110,67 +1146,7 @@ img {
   font-size: 38px;
   line-height: 1.3;
   letter-spacing: -0.025em;
-}
-
-.pd-header ul {
-  margin: 16px 0 0;
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.pd-summary {
-  margin: 8px 0 0;
-  color: var(--muted);
-}
-
-.pd-links {
-  display: flex;
-  gap: 20px;
-  margin-top: 8px;
-  font-size: 15px;
-}
-
-.pd-links a {
-  color: var(--accent);
-}
-
-.pager {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 64px;
-}
-
-.pager a {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px 20px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  transition: background-color 0.15s ease;
-}
-
-.pager a:hover {
-  background-color: var(--hover);
-}
-
-.pager .pager-next {
-  grid-column: 2;
-  text-align: right;
-}
-
-.pager-label {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.pager-title {
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.45;
+  text-wrap: balance;
 }
 
 /* ---------- Books ---------- */
@@ -1392,14 +1368,6 @@ img {
     font-size: 18px;
   }
 
-  .pager {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .pager .pager-next {
-    grid-column: 1;
-  }
-
   .book-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 28px 16px;
@@ -1425,6 +1393,16 @@ img {
   .skill-row {
     grid-template-columns: minmax(0, 1fr);
     gap: 6px;
+  }
+
+  .pf-overview > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .prose p:has(> img + img) > img {
+    width: 100%;
+    max-height: none;
   }
 }
 
@@ -1469,12 +1447,13 @@ img {
   .work,
   .resume-project,
   .resume-entry,
-  .skill-row {
+  .skill-list {
     break-inside: avoid;
   }
 
-  .resume-section h2,
-  .resume-item-head,
+  .titled-section h2,
+  .titled-section-head,
+  .item-head,
   .product-head {
     break-after: avoid;
   }

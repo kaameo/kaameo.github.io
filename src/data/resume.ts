@@ -1,14 +1,16 @@
 // Resume 페이지 내용. 이력서 저장소(resume.html)와 같은 내용을 손으로 맞춘다.
 // summary와 project.intro는 여러 문단 마크다운(빈 줄로 문단 구분), 불릿(items)은 한 줄 마크다운으로 쓴다: **굵게**, [링크](url), `코드`.
+// 불릿을 { text, case }로 쓰면 끝에 Portfolio의 Case(content/portfolio/<case>.md)로 가는 "자세히 →" 링크가 붙는다.
 
 type Link = { label: string; href: string };
+export type Bullet = string | { text: string; case: string };
 
 // 회사·직책 → 제품 → 업무 영역 → 불릿. 연구원과 인턴처럼 직책이 바뀌면 Employment를 나눈다.
-type Work = { title: string; stack: string; items: string[] };
+type Work = { title: string; stack: string; items: Bullet[] };
 type Product = { name: string; keywords: string; works: Work[] };
 type Employment = { company: string; role: string; period: string; products: Product[] };
 
-type Project = { title: string; subtitle: string; period: string; links: Link[]; intro: string; items: string[] };
+type Project = { title: string; subtitle: string; period: string; links: Link[]; intro: string; items: Bullet[] };
 
 // 학교, 교육과정, 자격증처럼 이름·기간만 있는 항목.
 type Entry = { name: string; subtitle: string; period: string; detail?: string; link?: Link };
@@ -30,7 +32,8 @@ export const resume: Resume = {
   name: "홍진수",
   role: "Backend Engineer",
   linkedin: "https://www.linkedin.com/in/jinsu-hong",
-  // 이력서 저장소의 resume.html을 Chrome으로 출력한 파일. 웹용이라 사진과 로컬 문서 링크는 뺐다.
+  // 이력서 저장소의 resume.html을 Chrome으로 출력한 파일. 웹용이라 사진은 빼고, EXPERIENCE 안내는 웹 Resume처럼
+  // "자세한 내용은 포트폴리오를 참고해 주세요."(사이트 /portfolio/ 링크)로 바꾸고, PROJECTS 안내는 뺐다.
   pdf: "/hong-jinsu_resume.pdf",
 
   summary: `Node.js 기반 백엔드와 Go 기반 데이터 수집 플랫폼을 설계하고 운영했습니다. AWS와 Kubernetes 환경에서 안정성과 운영 효율을 개선했고, 최근에는 Java/Spring 기반 프로젝트로 개발 범위를 넓히고 있습니다.
@@ -53,9 +56,9 @@ AI 에이전트를 개발과 검증에 활용합니다. 구현 계획을 검토�
               title: "멀티테넌트 수집 플랫폼 설계, 운영",
               stack: "Go, PostgreSQL, Redis Streams, Kafka",
               items: [
-                "글로벌 4개 보안 벤더를 지원하는 멀티테넌트 로그 수집 플랫폼 0→1 설계/구축",
-                "에러 로그 없이 유실된 수집 작업 80,375건의 원인 규명과 재발 방지",
-                "81분간 진행되는 수집을 10분 만에 타임아웃 처리해 반복 재수집되던 문제를 heartbeat로 해결",
+                { text: "글로벌 4개 보안 벤더를 지원하는 멀티테넌트 로그 수집 플랫폼 0→1 설계/구축", case: "sentivex-collection-platform" },
+                { text: "에러 로그 없이 유실된 수집 작업 80,375건의 원인 규명과 재발 방지", case: "sentivex-redis-streams-loss" },
+                { text: "81분간 진행되는 수집을 10분 만에 타임아웃 처리해 반복 재수집되던 문제를 heartbeat로 해결", case: "sentivex-heartbeat-timeout" },
               ],
             },
             {
@@ -106,9 +109,9 @@ AI 에이전트를 개발과 검증에 활용합니다. 구현 계획을 검토�
 
 MSA 전환의 서비스 간 연동을 설계하고, k3s 클러스터와 CI/CD, 모니터링 환경을 구축했습니다.`,
       items: [
-        "주문/취소/정산 등 7개 처리 과정의 공유 트랜잭션 의존을 멱등 API 재시도, Kafka 이벤트, 보상 처리로 제거",
-        "고객센터 앱을 GraalVM Native Image로 전환해 메모리 할당량 43% 절감, 기동 시간 약 25초 → 1.1초 단축",
-        "S3 직접 업로드 제약을 서버 경유 스트리밍으로 해결, 운영 단일 2GB 업로드에서 컨테이너 메모리 증가 약 6.7MiB 확인",
+        { text: "주문/취소/정산 등 7개 처리 과정의 공유 트랜잭션 의존을 멱등 API 재시도, Kafka 이벤트, 보상 처리로 제거", case: "hapbang-shared-transaction" },
+        { text: "고객센터 앱을 GraalVM Native Image로 전환해 메모리 할당량 43% 절감, 기동 시간 약 25초 → 1.1초 단축", case: "hapbang-native-image" },
+        { text: "S3 직접 업로드 제약을 서버 경유 스트리밍으로 해결, 운영 단일 2GB 업로드에서 컨테이너 메모리 증가 약 6.7MiB 확인", case: "hapbang-s3-streaming-upload" },
       ],
     },
     {
@@ -120,7 +123,7 @@ MSA 전환의 서비스 간 연동을 설계하고, k3s 클러스터와 CI/CD, �
 
 합방 프로젝트 팀원 3명에게 공유해 함께 사용했습니다.`,
       items: [
-        "질문 번호에 맞춰 직접 입력하던 답변을 버튼 선택과 일괄 전송으로 변경",
+        { text: "질문 번호에 맞춰 직접 입력하던 답변을 버튼 선택과 일괄 전송으로 변경", case: "sidecar-multi-session" },
         "세션별 작업 요약을 제공해, 다른 세션에서 돌아왔을 때 작업 맥락을 파악하도록 지원",
       ],
     },

@@ -1,5 +1,5 @@
 import { getAllBooks } from "@/lib/books";
-import { getAllPortfolio } from "@/lib/portfolio";
+import { getAllCases } from "@/lib/portfolio";
 import { getAllPosts } from "@/lib/posts";
 import { site } from "@/lib/site";
 
@@ -14,11 +14,8 @@ function link(title: string, path: string, description = "") {
 
 export function GET() {
   const posts = getAllPosts().map((p) => link(p.title, `/posts/${p.slug}/`, p.summary));
-  // 프로젝트는 summary가 없어 상세 페이지 메타데이터처럼 첫 highlight를 쓰고, 기술 스택을 덧붙인다.
-  const portfolio = getAllPortfolio().map((p) => {
-    const tech = p.tech.length ? ` (기술: ${p.tech.join(", ")})` : "";
-    return link(p.title, `/portfolio/${p.slug}/`, `${p.summary || (p.highlights[0] ?? "")}${tech}`);
-  });
+  // Case는 summary가 없어 상세 페이지 메타데이터처럼 첫 문단(문제 상황)을 쓰고, 어느 Project인지 앞에 붙인다.
+  const portfolio = getAllCases().map((c) => link(c.title, `/portfolio/${c.slug}/`, `${c.project.title}: ${c.summary}`));
   const books = getAllBooks().map((b) => link(b.title, `/books/${b.slug}/`, `${b.author} 지음, 감상평`));
 
   const text = [

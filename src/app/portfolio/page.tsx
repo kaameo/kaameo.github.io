@@ -1,61 +1,91 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { companies } from "@/data/companies";
-import { getAllPortfolio } from "@/lib/portfolio";
+import { projects, type Project } from "@/data/projects";
+import { getAllCases, type Case } from "@/lib/portfolio";
 
 export const metadata: Metadata = { title: "Portfolio" };
 
+const SECTIONS = [
+  { key: "experience", title: "Experience" },
+  { key: "project", title: "Projects" },
+] as const;
+
+// Project 하나: 개요 표 아래에 Case 제목을 불릿으로 두고, 각각 상세 페이지로 연결한다.
+function ProjectCard({ project, cases }: { project: Project; cases: Case[] }) {
+  return (
+    <article id={project.slug} className="pf-project">
+      <div className="item-head">
+        <h3>
+          {project.title}
+          <span className="item-sub">{project.subtitle}</span>
+        </h3>
+        <span className="period">{project.period}</span>
+      </div>
+
+      <dl className="pf-overview">
+        <div>
+          <dt>개요</dt>
+          <dd>{project.overview}</dd>
+        </div>
+        <div>
+          <dt>역할</dt>
+          <dd>{project.role}</dd>
+        </div>
+        <div>
+          <dt>기술 스택</dt>
+          <dd>{project.tech}</dd>
+        </div>
+        {project.links.length > 0 && (
+          <div>
+            <dt>링크</dt>
+            <dd className="item-links">
+              {project.links.map((link) => (
+                <a key={link.href} href={link.href}>
+                  {link.label} ↗
+                </a>
+              ))}
+            </dd>
+          </div>
+        )}
+      </dl>
+
+      {cases.length > 0 && (
+        <ul className="pf-cases">
+          {cases.map((c) => (
+            <li key={c.slug}>
+              <Link href={`/portfolio/${c.slug}/`}>
+                {c.title}
+                <span aria-hidden="true" className="arrow">
+                  →
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </article>
+  );
+}
+
 export default function PortfolioPage() {
-  const items = getAllPortfolio();
-  const groups = companies
-    .map((company) => ({
-      ...company,
-      projects: items.filter((i) => i.company === company.key && i.type === "project"),
-      troubles: items.filter((i) => i.company === company.key && i.type === "troubleshooting"),
-    }))
-    .filter((g) => g.projects.length + g.troubles.length > 0);
+  const cases = getAllCases();
 
   return (
     <>
       <h1 className="page-title">Portfolio</h1>
 
-      {groups.map((group) => (
-        <section key={group.key} className="group" aria-labelledby={`group-${group.key}`}>
-          <div className="group-head">
-            <h2 id={`group-${group.key}`}>{group.name}</h2>
-            <span className="period">{group.period}</span>
-          </div>
-
-          {group.projects.map((p) => (
-            <Link key={p.slug} href={`/portfolio/${p.slug}/`} className="project">
-              <div className="project-top">
-                <h3>{p.title}</h3>
-                <span aria-hidden="true" className="arrow">
-                  →
-                </span>
-              </div>
-              {p.tech.length > 0 && <span className="tech">{p.tech.join(" · ")}</span>}
-              {p.highlights.length > 0 && (
-                <ul>
-                  {p.highlights.map((h, i) => (
-                    <li key={i}>{h}</li>
-                  ))}
-                </ul>
-              )}
-            </Link>
-          ))}
-
-          {group.troubles.length > 0 && (
-            <div className="troubles">
-              <h3>Troubleshooting</h3>
-              {group.troubles.map((t) => (
-                <Link key={t.slug} href={`/portfolio/${t.slug}/`}>
-                  <span className="trouble-title">{t.title} →</span>
-                  {t.summary && <span className="trouble-summary">{t.summary}</span>}
-                </Link>
-              ))}
-            </div>
-          )}
+      {SECTIONS.map((section) => (
+        <section key={section.key} className="titled-section">
+          <h2>{section.title}</h2>
+          {projects
+            .filter((p) => p.section === section.key)
+            .map((project) => (
+              <ProjectCard
+                key={project.slug}
+                project={project}
+                cases={cases.filter((c) => c.project.slug === project.slug)}
+              />
+            ))}
         </section>
       ))}
     </>

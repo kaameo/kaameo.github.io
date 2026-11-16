@@ -1,62 +1,59 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { companies } from "@/data/companies";
+import { projects, type Project } from "@/data/projects";
 
 const PORTFOLIO_DIR = path.join(process.cwd(), "content", "portfolio");
 
-export type PortfolioItem = {
+// 하나의 Project에서 문제 상황 → 접근 방식 → 해결 및 성과로 정리한 기록. 상세 페이지 하나가 Case 하나다.
+export type Case = {
   slug: string;
   title: string;
-  company: string;
-  type: "project" | "troubleshooting";
-  period: string;
-  tech: string[];
-  highlights: string[];
-  summary: string;
-  github: string;
-  demo: string;
+  project: Project;
   order: number;
+  // 상세 페이지 설명과 llms.txt에 쓰는 첫 문단(보통 문제 상황)
+  summary: string;
   content: string;
 };
 
-function readItem(file: string): PortfolioItem {
+// 제목·이미지·목록·표를 건너뛴 첫 문단을 링크와 강조 기호 없이 한 줄로 만든다.
+function firstParagraph(markdown: string): string {
+  const block = markdown
+    .split(/\n\s*\n/)
+    .map((b) => b.trim())
+    .find((b) => b && !/^(#|!\[|-|\|)/.test(b));
+  return (block ?? "")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/[`*]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function readCase(file: string): Case {
   const raw = fs.readFileSync(path.join(PORTFOLIO_DIR, file), "utf8");
   const { data, content } = matter(raw);
+  const project = projects.find((p) => p.slug === data.project);
+  // 오타로 Case가 조용히 사라지지 않게 빌드를 멈춘다.
+  if (!project) throw new Error(`content/portfolio/${file}: project "${data.project}"가 src/data/projects.ts에 없습니다.`);
   return {
     slug: file.replace(/\.md$/, ""),
     title: String(data.title ?? ""),
-    company: String(data.company ?? ""),
-    type: data.type === "troubleshooting" ? "troubleshooting" : "project",
-    period: String(data.period ?? ""),
-    tech: Array.isArray(data.tech) ? data.tech.map(String) : [],
-    highlights: Array.isArray(data.highlights) ? data.highlights.map(String) : [],
-    summary: String(data.summary ?? ""),
-    github: String(data.github ?? ""),
-    demo: String(data.demo ?? ""),
+    project,
     order: Number(data.order ?? 0),
+    summary: firstParagraph(content),
     content,
   };
 }
 
-const companyIndex = (key: string) => {
-  const i = companies.findIndex((c) => c.key === key);
-  return i === -1 ? companies.length : i;
-};
-
-export function getAllPortfolio(): PortfolioItem[] {
+// Project 순서(src/data/projects.ts), 그 안에서는 order 순.
+export function getAllCases(): Case[] {
   if (!fs.existsSync(PORTFOLIO_DIR)) return [];
   return fs
     .readdirSync(PORTFOLIO_DIR)
     .filter((f) => f.endsWith(".md"))
-    .map(readItem)
-    .sort((a, b) => companyIndex(a.company) - companyIndex(b.company) || a.order - b.order);
+    .map(readCase)
+    .sort((a, b) => projects.indexOf(a.project) - projects.indexOf(b.project) || a.order - b.order);
 }
 
-export function getPortfolioItem(slug: string): PortfolioItem | undefined {
-  return getAllPortfolio().find((item) => item.slug === slug);
-}
-
-export function getCompanyName(key: string): string {
-  return companies.find((c) => c.key === key)?.name ?? key;
+export function getCase(slug: string): Case | undefined {
+  return getAllCases().find((c) => c.slug === slug);
 }
