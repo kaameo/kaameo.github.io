@@ -10,11 +10,14 @@ import rehypeReact from "rehype-react";
 import CodeBlock from "@/components/CodeBlock";
 import HeadingAnchor from "@/components/HeadingAnchor";
 
+// 취소선은 ~~두 개~~만 인정한다. "23~28초 → 1.10~1.16초"처럼 범위를 나타내는 ~ 두 개가 한 줄에 있으면 취소선으로 바뀌기 때문이다.
+const gfm = { singleTilde: false };
+
 // 마크다운을 React 요소로 바꾼다. 코드 블록과 h2는 복사 기능이 있는 컴포넌트로 그린다.
 export async function renderMarkdown(markdown: string): Promise<ReactElement> {
   const file = await unified()
     .use(remarkParse)
-    .use(remarkGfm)
+    .use(remarkGfm, gfm)
     .use(remarkRehype)
     .use(rehypeSlug)
     .use(rehypePrettyCode, {
@@ -46,7 +49,7 @@ function rehypeUnwrapParagraph() {
 export async function renderInlineMarkdown(markdown: string): Promise<ReactElement> {
   const file = await unified()
     .use(remarkParse)
-    .use(remarkGfm)
+    .use(remarkGfm, gfm)
     .use(remarkRehype)
     .use(rehypeUnwrapParagraph)
     .use(rehypeReact, { Fragment: runtime.Fragment, jsx: runtime.jsx, jsxs: runtime.jsxs })
