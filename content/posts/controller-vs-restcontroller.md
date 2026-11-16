@@ -3,6 +3,7 @@ title: "@Controller와 @RestController의 차이점"
 date: "2025-10-10"
 summary: "Spring의 @Controller와 @RestController 어노테이션의 차이점과 사용 시나리오를 실제 예제와 함께 알아봅니다"
 tags: ["Spring Boot", "Java", "Backend", "REST API", "Web MVC"]
+draft: false
 ---
 
 ## 개요

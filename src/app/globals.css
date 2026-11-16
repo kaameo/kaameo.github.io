@@ -302,11 +302,6 @@ img {
   object-fit: cover;
 }
 
-.kv-list {
-  margin: 0;
-}
-
-.kv-row,
 .compact-item {
   display: grid;
   grid-template-columns: 92px minmax(0, 1fr);
@@ -314,21 +309,11 @@ img {
   border-bottom: 1px solid var(--line);
 }
 
-.kv-row {
-  padding: 12px 0;
-}
-
-.kv-row dt,
 .compact-item time {
   padding-top: 2px;
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--muted);
-}
-
-.kv-row dd {
-  margin: 0;
-  font-size: 15px;
 }
 
 .compact-item {
@@ -347,6 +332,18 @@ img {
 }
 
 /* Books 바로가기 */
+/* 최근 글과 Books를 한 덩어리로 묶어 섹션 간격(72px)보다 가깝게 둔다. */
+.home-recent {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.home-books-section {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .home-books {
   display: inline-flex;
   align-items: flex-end;
@@ -367,12 +364,12 @@ img {
 .cover-stack {
   display: flex;
   align-items: flex-end;
-  height: 84px;
-  padding-left: 8px;
+  height: 102px;
+  padding-left: 10px;
 }
 
 .cover-stack img {
-  height: 76px;
+  height: 92px;
   width: auto;
   border-radius: 2px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
@@ -381,7 +378,7 @@ img {
 }
 
 .cover-stack img + img {
-  margin-left: -34px;
+  margin-left: -41px;
 }
 
 .cover-stack img:nth-child(1) {

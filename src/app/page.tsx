@@ -34,43 +34,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="about">
-        <div className="section-head">
-          <h2 id="about">About</h2>
-        </div>
-        <dl className="kv-list">
-          {site.about.items.map((item) => (
-            <div key={item.label} className="kv-row">
-              <dt>{item.label}</dt>
-              <dd className={item.mono ? "mono" : undefined}>{item.value}</dd>
-            </div>
+      <div className="home-recent">
+        <section aria-labelledby="recent-posts">
+          <div className="section-head">
+            <h2 id="recent-posts">최근 글</h2>
+            <Link href="/posts/">전체 보기 →</Link>
+          </div>
+          {recent.map((post) => (
+            <Link key={post.slug} href={`/posts/${post.slug}/`} className="compact-item">
+              <time dateTime={post.date}>{formatDot(post.date)}</time>
+              <span>{post.title}</span>
+            </Link>
           ))}
-        </dl>
-      </section>
+        </section>
 
-      <section aria-labelledby="recent-posts">
-        <div className="section-head">
-          <h2 id="recent-posts">최근 글</h2>
-          <Link href="/posts/">전체 보기 →</Link>
-        </div>
-        {recent.map((post) => (
-          <Link key={post.slug} href={`/posts/${post.slug}/`} className="compact-item">
-            <time dateTime={post.date}>{formatDot(post.date)}</time>
-            <span>{post.title}</span>
+        <section aria-label="Books" className="home-books-section">
+          <Link href="/books/" className="home-books">
+            <span className="cover-stack" aria-hidden="true">
+              {covers.map((book) => (
+                <img key={book.slug} src={book.cover} alt="" />
+              ))}
+            </span>
+            <span className="home-books-label">Books →</span>
           </Link>
-        ))}
-      </section>
-
-      <section aria-label="Books">
-        <Link href="/books/" className="home-books">
-          <span className="cover-stack" aria-hidden="true">
-            {covers.map((book) => (
-              <img key={book.slug} src={book.cover} alt="" />
-            ))}
-          </span>
-          <span className="home-books-label">Books →</span>
-        </Link>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
