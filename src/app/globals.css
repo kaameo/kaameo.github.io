@@ -749,10 +749,21 @@ img {
 }
 
 /* ---------- Resume ---------- */
+/* 이력서 저장소 resume.html의 계층(회사·직책 → 제품 → 업무 영역)을 사이트 글꼴과 색으로 옮겼다.
+   제품 제목을 회사 줄보다 크게 둬서, 회사 + 제품이 아래 업무 영역들의 머리로 읽히게 한다. */
 .resume-header {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+}
+
+.resume-role {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .resume-title-row {
@@ -763,44 +774,37 @@ img {
   gap: 12px 16px;
 }
 
-.resume-intro {
-  margin: 0;
-  font-size: 17px;
-  color: var(--muted);
+.resume-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: background-color 0.15s ease;
 }
 
-.resume-intro p {
-  margin: 0;
-}
-
-.resume-intro strong {
-  color: var(--fg);
-}
-
-.resume-intro a,
-.job li a,
-.resume-project a {
-  color: var(--accent);
+.resume-pdf:hover {
+  background-color: var(--hover);
 }
 
 .resume-contact {
   display: flex;
   flex-wrap: wrap;
   gap: 6px 20px;
-  margin-top: 6px;
+  margin-top: 4px;
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--muted);
 }
 
 .resume-contact a,
-.accent-link {
+.resume-summary a,
+.resume-bullets a,
+.resume-links a {
   color: var(--accent);
-}
-
-.accent-link {
-  width: fit-content;
-  font-size: 14px;
 }
 
 /* 섹션 제목을 내용 위에 두고, 제목 아래 가로줄로 섹션을 나눈다. */
@@ -818,45 +822,93 @@ img {
   letter-spacing: -0.015em;
 }
 
-.resume-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  min-width: 0;
+.resume-summary p {
+  margin: 0;
 }
 
-.resume-stack.tight {
-  gap: 14px;
+.resume-summary p + p {
+  margin-top: 12px;
 }
 
-.job {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+/* 직책, 프로젝트 사이는 가는 선으로 나눈다. */
+.resume-item + .resume-item {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
 }
 
-.job-top {
+/* 이름은 왼쪽, 기간은 오른쪽. 폭이 좁으면 기간이 아래 줄로 내려간다. */
+.resume-item-head {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  gap: 4px 16px;
+  gap: 2px 16px;
 }
 
-.job h3 {
+.resume-item-head h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
 }
 
-.job-role {
-  margin: 0;
-  font-size: 15px;
+.resume-sub {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 400;
   color: var(--muted);
 }
 
-.job ul {
-  margin: 8px 0 0;
+.resume-title-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+}
+
+.resume-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  font-size: 14px;
+}
+
+.product {
+  margin-top: 6px;
+}
+
+.product-head,
+.work-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+
+.product-head h4 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.work {
+  margin-top: 16px;
+}
+
+.work-head h5 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.resume-tags {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.resume-bullets {
+  margin: 6px 0 0;
   padding-left: 18px;
   display: flex;
   flex-direction: column;
@@ -864,16 +916,34 @@ img {
   font-size: 15px;
 }
 
+.resume-intro {
+  margin: 10px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--line);
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.resume-intro p {
+  margin: 0;
+}
+
+.skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .skill-row {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
+  grid-template-columns: 148px minmax(0, 1fr);
   gap: 12px;
   align-items: baseline;
 }
 
 .skill-group {
   font-size: 14px;
-  color: var(--muted);
+  font-weight: 600;
 }
 
 .chips {
@@ -890,16 +960,15 @@ img {
   font-size: 12px;
 }
 
-.resume-project h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+.resume-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.resume-project p {
+.resume-entry-detail {
   margin: 2px 0 0;
   font-size: 15px;
-  color: var(--muted);
 }
 
 /* ---------- Portfolio ---------- */
@@ -1345,6 +1414,15 @@ img {
   .book-header-info h1 {
     font-size: 26px;
   }
+
+  .product-head h4 {
+    font-size: 18px;
+  }
+
+  .skill-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1385,8 +1463,16 @@ img {
     padding: 0;
   }
 
-  .resume-section,
-  .job {
+  .work,
+  .resume-project,
+  .resume-entry,
+  .skill-row {
     break-inside: avoid;
+  }
+
+  .resume-section h2,
+  .resume-item-head,
+  .product-head {
+    break-after: avoid;
   }
 }
