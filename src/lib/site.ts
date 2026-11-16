@@ -9,7 +9,8 @@ export const site = {
   postsPerPage: 10,
 
   hero: {
-    greeting: "안녕하세요, 홍진수입니다.",
+    // \n 자리에서 줄을 바꾼다.
+    greeting: "견고한 서비스에 진심인 개발자,\n홍진수입니다.",
     intro: "보안 로그 수집 플랫폼을 만들며 데이터 정합성과 장애 복구를 고민해 온 백엔드 엔지니어입니다. 요즘은 분산 시스템과 Kubernetes 운영에 관심이 많습니다.",
   },
 
