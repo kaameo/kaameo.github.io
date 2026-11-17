@@ -66,4 +66,6 @@ Resume 불릿을 `{ text: "...", case: "사례 파일 이름" }`으로 쓰면 �
 
 1. GitHub에 `kaameo.github.io` 저장소를 만들고 이 폴더를 `main` 브랜치로 푸시합니다.
 2. 저장소 Settings → Pages → Build and deployment의 Source를 **GitHub Actions**로 바꿉니다.
-3. 이후 `main`에 푸시할 때마다 `.github/workflows/deploy.yml`이 자동으로 배포합니다.
+3. 이후 `main`에 푸시할 때마다 `.github/workflows/deploy.yml`이 자동으로 배포합니다. 설치 전에 `pnpm audit`로 high 이상 취약점을 검사하고, 걸리면 배포하지 않습니다. PR에서는 빌드만 확인합니다.
+
+의존성과 Actions 버전은 Dependabot(`.github/dependabot.yml`)이 매주 PR로 올립니다. Actions는 커밋 SHA로 고정해 두었으니 손으로 버전을 바꿀 때도 SHA와 뒤의 `# vX.Y.Z` 주석을 함께 바꿉니다.

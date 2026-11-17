@@ -1,25 +1,26 @@
 name: Security Audit
 
+# 배포 워크플로가 push와 PR마다 감사한다.
+# 이 워크플로는 코드가 그대로여도 새로 공개된 취약점을 잡으려고 주기적으로 돈다.
 on:
   schedule:
     # 매주 월요일 09:00 (KST)
     - cron: '0 0 * * 1'
   workflow_dispatch:
-  pull_request:
-    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      # high 이상 취약점이 있으면 실패한다.
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # lockfile만 보고 감사하므로 설치하지 않는다. high 이상 취약점이 있으면 실패한다.
       - run: pnpm audit --audit-level high
-      - name: Check for outdated packages
-        run: pnpm outdated || true
