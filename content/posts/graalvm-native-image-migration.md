@@ -129,14 +129,22 @@ Spring Boot 앱 하나는 400~500MiB가 필요하다. 세 개를 따로 띄우�
 
 같은 날 Grafana에 "앱 개요" dashboard(#601)를 만들어 6개 앱을 한 화면에 놓고 보니 상황이 더 분명해졌다.
 
-|앱|limit|7일 최대 working set|사용률|
-|---|---|---|---|
-|billing|448Mi|448Mi|**100%**|
-|lecture|640Mi|589Mi|92%|
-|customer-support|448Mi|404Mi|90%|
-|member|512Mi|456Mi|89%|
-|appearance|576Mi|510Mi|89%|
-|chat|576Mi|492Mi|85%|
+```chart
+{
+  "title": "7일 최대 working set: 6개 앱 모두 limit의 85% 이상을 쓰고 있었다",
+  "unit": "Mi",
+  "series": [{ "name": "7일 최대 working set" }],
+  "rows": [
+    { "label": "billing · 100%", "values": [448], "limit": 448 },
+    { "label": "lecture · 92%", "values": [589], "limit": 640 },
+    { "label": "customer-support · 90%", "values": [404], "limit": 448 },
+    { "label": "member · 89%", "values": [456], "limit": 512 },
+    { "label": "appearance · 89%", "values": [510], "limit": 576 },
+    { "label": "chat · 85%", "values": [492], "limit": 576 }
+  ],
+  "caption": "Grafana \"앱 개요\" dashboard(#601)에서 2026-11-03에 본 7일 최대값이다. 라벨 옆 숫자는 limit 대비 사용률이다."
+}
+```
 
 billing-app은 working set이 limit에 붙어 있었다(RSS 기준 7일 최대 444Mi). Grafana도 448Mi 중 418Mi(93%)까지 올라가 있었다. OOMKilled는 7일 동안 없었다. 그래도 여유가 거의 없어서 둘은 바로 512Mi로 올렸다(#608). 그 결과 남은 공간은 더 줄었다. medium의 request 여유는 248Mi가 됐다.
 
@@ -379,12 +387,24 @@ macOS arm64에서 같은 jar·실행 파일, 같은 인프라, 같은 작업으�
 
 native에도 `-XX:ActiveProcessorCount=2`를 줬다.
 
-|지표|JVM|native|차이|
-|---|---|---|---|
-|기동|4.3초|0.57초|약 1/7|
-|RSS, 기동 20초 뒤|379Mi|208Mi|−45%|
-|RSS, 작업 직후|413Mi|231Mi|−44%|
-|RSS, 60초 idle 뒤|415Mi|233Mi|−44%|
+기동은 JVM 4.3초, native 0.57초로 약 1/7이었다. RSS는 세 시점 모두 native가 44~45% 작았다.
+
+```chart
+{
+  "title": "같은 조건에서 잰 RSS: native가 44~45% 작다",
+  "unit": "Mi",
+  "series": [{ "name": "JVM" }, { "name": "native" }],
+  "rows": [
+    { "label": "기동 20초 뒤 · JVM", "values": [379, null] },
+    { "label": "기동 20초 뒤 · native (−45%)", "values": [null, 208] },
+    { "label": "작업 직후 · JVM", "values": [413, null] },
+    { "label": "작업 직후 · native (−44%)", "values": [null, 231] },
+    { "label": "60초 idle 뒤 · JVM", "values": [415, null] },
+    { "label": "60초 idle 뒤 · native (−44%)", "values": [null, 233] }
+  ],
+  "caption": "macOS arm64 로컬에서 같은 jar·실행 파일, 같은 인프라, 같은 작업으로 쟀다. JVM은 Serial GC·CPU 2개·heap 상한 448Mi×60%로 운영 조건에 맞췄다."
+}
+```
 
 처음에는 GC·CPU 조건을 맞추지 않고 쟀다. 그때는 JVM 390/419/415Mi, native 210/236/208Mi로 차이가 44~50%였다. 리뷰에서 "로컬 JVM은 CPU가 많아 G1을 골랐을 수 있다"는 지적을 받고 조건을 맞춰 다시 쟀다. 결과는 큰 차이가 없었다.
 
@@ -447,7 +467,18 @@ medium 노드 전체 사용량은 2,894Mi(75%, 11-03)에서 2,667Mi(69%, 11-04 0
 
 medium 노드의 스케줄러 요청 합계는 이 변경으로 192Mi 줄었다(3,712 → 3,520Mi, 할당 가능 3,832Mi의 96% → 92%).
 
-![customer-support-app 메모리 할당량: JVM 448MiB → Native Image 256MiB로 낮춰 노드에 192MiB 확보(request·limit 기준)](/posts/graalvm-native-image-migration/native-image-memory.png)
+```chart
+{
+  "title": "working set이 줄어 limit을 448Mi에서 256Mi로 낮췄다",
+  "unit": "Mi",
+  "series": [{ "name": "working set 최대" }],
+  "rows": [
+    { "label": "JVM · 7일 최대", "values": [404], "limit": 448 },
+    { "label": "native · 256Mi 적용 뒤 약 17시간 최대", "values": [123], "limit": 256 }
+  ],
+  "caption": "customer-support-app의 working set 최대와 memory limit(= request)이다. JVM은 전환 전 7일, native는 256Mi·-Xmx128m 적용 뒤 약 17시간의 값이라 잰 기간이 다르다. 같은 조건 비교는 7.1에 있다. limit을 낮춘 192Mi만큼 medium 노드에 request 자리가 생겼다."
+}
+```
 
 ### 7.5 결정: 넓히지 않고 한 앱만 유지한다
 
@@ -487,6 +518,23 @@ customer-support-app은 native로 유지하고, 다른 앱으로 넓히는 것�
 |이 앱 CI job 전체|약 14~18분|예: [11-04 dev run](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41744360052/job/126293709822) 00:07:39 → 00:25:47 UTC|
 |native 컴파일 최대 메모리|CI 11.65~12.19GB, 로컬 9.38GB|빌드 출력 `Peak RSS`(위 CI 링크)|
 |native 컴파일 단계별(첫 빌드)|분석 164초, 메서드 컴파일 342초, 기타|[1차 CI](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41588071359/job/125758375245) 빌드 출력 `[2/8]`~`[8/8]`|
+
+```chart
+{
+  "title": "같은 CI run에서 이 앱 job만 13분을 넘었다",
+  "unit": "분",
+  "series": [{ "name": "테스트·jar 빌드 등" }, { "name": "native 컴파일·이미지 확인" }],
+  "rows": [
+    { "label": "customer-support", "values": [2.3, 11.0] },
+    { "label": "billing", "values": [5.7, null] },
+    { "label": "chat", "values": [5.2, null] },
+    { "label": "member", "values": [4.5, null] },
+    { "label": "appearance", "values": [3.8, null] },
+    { "label": "lecture", "values": [3.2, null] }
+  ],
+  "caption": "2026-11-03 최종 CI run(a20d350c)의 job별 시작~끝 시각이다. customer-support는 GraalVM 설치부터 native 이미지 빌드 확인까지(10분 57초)를 native 단계로 묶었다."
+}
+```
 
 이 시간이 실제로 어떤 영향을 주는지는 다음과 같다.
 

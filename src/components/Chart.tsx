@@ -9,7 +9,10 @@ import {
 } from "@/lib/figure-spec";
 
 type Series = { name: string; track?: boolean };
-type Row = { label: string; values: number[]; limit?: number };
+// null은 그 항목에 해당 series가 없다는 뜻이다(막대에 안 그리고 표에는 "-"로 쓴다).
+// JVM·native를 다른 줄에 나란히 놓을 때처럼, 줄마다 series 하나만 쓰는 비교에 쓴다.
+type Value = number | null;
+type Row = { label: string; values: Value[]; limit?: number };
 type Spec = {
   title: string;
   unit?: string;
@@ -56,10 +59,11 @@ function parseSpec(source: string): Spec {
     if (
       !Array.isArray(values) ||
       values.length !== parsedSeries.length ||
-      !values.every((v) => isNumber(v) && v >= 0)
+      !values.every((v) => v === null || (isNumber(v) && v >= 0)) ||
+      values.every((v) => v === null)
     ) {
       fail(
-        `rows[${i}].values는 series 수(${parsedSeries.length})만큼의 0 이상 숫자여야 합니다.`,
+        `rows[${i}].values는 series 수(${parsedSeries.length})만큼의 0 이상 숫자(또는 null)여야 하고, 하나 이상은 숫자여야 합니다.`,
       );
     }
     if (limit !== undefined && !(isNumber(limit) && limit > 0))
@@ -92,7 +96,8 @@ function niceScale(dataMax: number) {
   return { max, ticks };
 }
 
-const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
+const sum = (values: Value[]) =>
+  values.reduce<number>((a, b) => a + (b ?? 0), 0);
 
 export default function Chart({ source }: { source: string }) {
   const {
@@ -116,38 +121,48 @@ export default function Chart({ source }: { source: string }) {
   const { max, ticks } = niceScale(dataMax);
   const pct = (v: number) => `${(v / max) * 100}%`;
   const hasLimit = rows.some((r) => r.limit !== undefined);
+  // 한 줄에 값이 둘 이상 쌓이는 줄이 있을 때만 표에 합계 칸을 둔다.
+  const hasStack = rows.some(
+    (r) => r.values.filter((v) => v !== null).length > 1,
+  );
+  // series가 하나면 제목이 무엇을 그렸는지 말해 주므로 범례에 넣지 않는다.
+  const legendSeries = series.length > 1 ? series : [];
   const withUnit = (v: number) => `${format(v)}${unit}`;
 
   return (
     <figure className="chart">
       <figcaption className="chart-title">{title}</figcaption>
 
-      <ul className="chart-legend">
-        {series.map((s, i) => (
-          <li key={s.name}>
-            <span
-              className="chart-swatch"
-              style={{ background: colors[i] }}
-              aria-hidden="true"
-            />
-            {s.name}
-          </li>
-        ))}
-        {hasLimit && (
-          <li>
-            <span className="chart-swatch-line" aria-hidden="true" />
-            {limitLabel}
-          </li>
-        )}
-      </ul>
+      {(legendSeries.length > 0 || hasLimit) && (
+        <ul className="chart-legend">
+          {legendSeries.map((s, i) => (
+            <li key={s.name}>
+              <span
+                className="chart-swatch"
+                style={{ background: colors[i] }}
+                aria-hidden="true"
+              />
+              {s.name}
+            </li>
+          ))}
+          {hasLimit && (
+            <li>
+              <span className="chart-swatch-line" aria-hidden="true" />
+              {limitLabel}
+            </li>
+          )}
+        </ul>
+      )}
 
       <div className="chart-rows">
         {rows.map((row) => {
           const total = sum(row.values);
           const over = row.limit !== undefined ? total - row.limit : 0;
           const label = [
-            ...row.values.map((v, i) => `${series[i].name} ${withUnit(v)}`),
-            `합계 ${withUnit(total)}`,
+            ...row.values.flatMap((v, i) =>
+              v === null ? [] : [`${series[i].name} ${withUnit(v)}`],
+            ),
+            ...(hasStack ? [`합계 ${withUnit(total)}`] : []),
             ...(row.limit !== undefined
               ? [`${limitLabel} ${withUnit(row.limit)}`]
               : []),
@@ -183,7 +198,7 @@ export default function Chart({ source }: { source: string }) {
                 ))}
                 <div className="chart-bar" style={{ width: pct(total) }}>
                   {row.values.map((v, i) =>
-                    v > 0 ? (
+                    v ? (
                       <span
                         key={series[i].name}
                         className="chart-seg"
@@ -225,7 +240,7 @@ export default function Chart({ source }: { source: string }) {
                   {s.name}
                 </th>
               ))}
-              <th scope="col">합계</th>
+              {hasStack && <th scope="col">합계</th>}
               {hasLimit && <th scope="col">{limitLabel}</th>}
               {hasLimit && <th scope="col">초과</th>}
             </tr>
@@ -239,9 +254,11 @@ export default function Chart({ source }: { source: string }) {
                 <tr key={row.label}>
                   <th scope="row">{row.label}</th>
                   {row.values.map((v, i) => (
-                    <td key={series[i].name}>{format(v)}</td>
+                    <td key={series[i].name}>
+                      {v === null ? "-" : format(v)}
+                    </td>
                   ))}
-                  <td>{format(total)}</td>
+                  {hasStack && <td>{format(total)}</td>}
                   {hasLimit && (
                     <td>{row.limit !== undefined ? format(row.limit) : "-"}</td>
                   )}
