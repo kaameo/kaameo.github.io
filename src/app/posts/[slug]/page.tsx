@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Comments from "@/components/Comments";
-import { getAllPosts, getPost } from "@/lib/posts";
+import { getAllPosts, getPost, getPostSlugs } from "@/lib/posts";
 import { renderMarkdown } from "@/lib/markdown";
 import { formatDot, formatLong } from "@/lib/date";
 
@@ -11,7 +11,7 @@ type Params = { slug: string };
 export const dynamicParams = false;
 
 export function generateStaticParams(): Params[] {
-  return getAllPosts().map((post) => ({ slug: post.slug }));
+  return getPostSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -42,6 +42,12 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             <time dateTime={post.date}>{formatLong(post.date)}</time>
             <span aria-hidden="true">·</span>
             <span>{post.readingMinutes}분 분량</span>
+            {post.draft && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>초안(개발 서버에서만 보임)</span>
+              </>
+            )}
           </div>
           {post.tags.length > 0 && (
             <ul aria-label="태그" className="tags">

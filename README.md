@@ -32,6 +32,68 @@ draft: false
 
 `draft: true`로 두면 사이트에 나오지 않습니다.
 
+### 그래프 넣기
+
+언어를 `chart`로 적은 코드 블록에 JSON을 쓰면 가로 누적 막대 그래프로 그려집니다. 빌드 때 HTML로 그려지고 다크 모드를 따라갑니다. Obsidian이나 GitHub에서는 그냥 코드 블록으로 보입니다.
+
+````md
+```chart
+{
+  "title": "그래프 제목",
+  "unit": "MiB",
+  "series": [
+    { "name": "heap 사용" },
+    { "name": "heap 상한까지 빈 공간", "track": true },
+    { "name": "off-heap" }
+  ],
+  "rows": [
+    { "label": "billing", "values": [95, 166, 285], "limit": 448 }
+  ],
+  "caption": "그래프 아래에 붙일 설명(선택)"
+}
+```
+````
+
+- `series`는 순서대로 색이 정해집니다(색이 있는 series는 4개까지). `"track": true`는 바로 앞 series의 비어 있는 부분이라 같은 색을 옅게 씁니다.
+- `values`는 `series`와 같은 순서와 개수로 씁니다. `limit`(선택)을 주면 세로선과 초과량이 표시됩니다. 선 이름은 `limitLabel`로 바꿀 수 있습니다(기본값 `limit`).
+- JSON이 틀리면 빌드가 멈추고 어디가 틀렸는지 알려 줍니다.
+
+### 배치도 넣기
+
+언어를 `cluster`로 적으면 노드(서버)마다 카드 하나를 그리고, 그 안에 묶음별로 pod를 나열합니다. 넓은 화면에서는 카드가 나란히 놓입니다.
+노드에 `capacity`를 주면 pod를 `value`에 비례하는 블록으로 이어 붙인 막대도 그립니다.
+
+````md
+```cluster
+{
+  "title": "배치도 제목",
+  "unit": "Mi",
+  "valueLabel": "limit 합계",
+  "capacityLabel": "할당 가능",
+  "restLabel": "그 밖의 pod·빈 자리",
+  "entry": ["인터넷 (HTTPS 443)", "EIP", "Envoy Gateway proxy"],
+  "nodes": [
+    {
+      "name": "t3.large",
+      "details": ["k3s server", "노드 라벨 core-data"],
+      "capacity": 7818,
+      "groups": [
+        { "name": "데이터", "color": 2, "items": [{ "name": "PostgreSQL", "value": 768 }] }
+      ]
+    }
+  ],
+  "caption": "그림 아래에 붙일 설명(선택)"
+}
+```
+````
+
+- `entry`(선택)는 요청이 들어오는 길을 화살표로 잇습니다.
+- 묶음의 `color`는 1~4(그래프와 같은 색 순서)이고, 빼면 회색입니다. 노드가 달라도 같은 묶음에는 같은 번호를 씁니다.
+- `value`(선택)는 숫자로 쓰고 `unit`이 뒤에 붙습니다. `note`(선택)는 이름 옆에 흐리게 붙습니다.
+- `capacity`(선택)를 주면 막대 위에 "`valueLabel` 합 / `capacityLabel` 용량 · 비율"이 붙고, 용량까지 남는 부분은 회색 블록(`restLabel`)이 됩니다. 막대 길이는 가장 큰 노드에 맞춰서 노드끼리도 같은 축척입니다.
+
+`pnpm dev`에서는 `draft: true`인 글도 주소로 열 수 있습니다(목록에는 나오지 않고, 제목 아래에 "초안" 표시가 붙습니다). 빌드 결과에는 들어가지 않습니다.
+
 ## 내용 바꾸기
 
 | 바꿀 것 | 파일 |
