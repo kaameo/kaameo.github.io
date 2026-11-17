@@ -497,7 +497,7 @@ customer-support-app은 native로 유지하고, 다른 앱으로 넓히는 것�
 |실행 메모리|RSS 379~415Mi(로컬, 같은 조건) / 운영 391Mi(limit 448Mi)|RSS 208~233Mi / 운영 최대 123Mi(limit 256Mi, 약 17시간)|**얻음**: 같은 조건 −44~45%, limit −192Mi|
 |기동 시간|운영 22.9~27.8초|운영 1.10~1.16초|**얻음**|
 |컨테이너 이미지(압축, amd64)|204.5MiB(9 layer, `sha-265cee7b`)|144.3MiB(4 layer, `sha-821abc2d`)|**얻음**: 내려받는 양 −29%. `docker manifest inspect -v`로 GHCR에서 확인|
-|CI 시간(이 앱 job)|테스트+jar 약 2분, job 3분 안팎|job 14~18분(native 컴파일 10~14분 추가)|**잃음**|
+|CI 시간(이 앱 job)|테스트+jar 약 2분, job 3분 안팎|job 13~18분(native 컴파일 10~14분 추가)|**잃음**|
 |CI 러너 메모리|Gradle 테스트 수준|native 컴파일 최대 11.6~12.2GB(러너 16GB)|**잃음**: 여유가 작다|
 |로컬 개발 반복|jar 빌드 수십 초|native 빌드 약 4분(macOS, 최대 9.4GB)|**잃음**: 평소 개발은 JVM으로 한다|
 |런타임 유연성|프로필·조건을 실행 때 바꿀 수 있다|빈 구성이 빌드 때 굳는다(prod)|**잃음**|
@@ -515,7 +515,7 @@ customer-support-app은 native로 유지하고, 다른 앱으로 넓히는 것�
 |native 컴파일(CI, 4 vCPU)|11분 14초 / 13분 58초 / 10분 24초|CI 로그 `Finished generating`: [1차](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41588071359/job/125758375245), [2차](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41590255375/job/125765684968), [최종](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41601254591/job/125800510305)|
 |native 컴파일(로컬 macOS arm64)|3분 51초|로컬 Gradle(링크 없음)|
 |JVM 테스트 + jar(CI)|1분 54초|[1차 CI job](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41588071359/job/125758375245)의 `테스트·jar 빌드` 단계|
-|이 앱 CI job 전체|약 14~18분|예: [11-04 dev run](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41744360052/job/126293709822) 00:07:39 → 00:25:47 UTC|
+|이 앱 CI job 전체|13~18분|[11-03 최종 CI](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41601254591/job/125800510305) 13분 16초, [11-04 dev run](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41744360052/job/126293709822) 18분 8초(00:07:39 → 00:25:47 UTC)|
 |native 컴파일 최대 메모리|CI 11.65~12.19GB, 로컬 9.38GB|빌드 출력 `Peak RSS`(위 CI 링크)|
 |native 컴파일 단계별(첫 빌드)|분석 164초, 메서드 컴파일 342초, 기타|[1차 CI](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41588071359/job/125758375245) 빌드 출력 `[2/8]`~`[8/8]`|
 
@@ -538,11 +538,11 @@ customer-support-app은 native로 유지하고, 다른 앱으로 넓히는 것�
 
 이 시간이 실제로 어떤 영향을 주는지는 다음과 같다.
 
-- **PR 대기 시간이 늘었다.** customer-support-app이나 공용 모듈(`common/*`, 루트 Gradle 설정)이 바뀌는 PR은 CI가 이 앱 job을 기다려야 끝난다. 다른 앱 job은 4~6분이면 끝나는데, 이 job만 14~18분이다.
+- **PR 대기 시간이 늘었다.** customer-support-app이나 공용 모듈(`common/*`, 루트 Gradle 설정)이 바뀌는 PR은 CI가 이 앱 job을 기다려야 끝난다. 같은 run에서 다른 앱 job은 3~7분이면 끝나는데, 이 job만 13~18분이다.
 - **배포가 늦어졌다.** dev push의 publish run이 CI를 재사용하므로, native 컴파일이 배포 경로에 그대로 들어간다. 이번에는 다른 PR이 연달아 병합되면서 뒤 run이 native 컴파일을 다시 거친 뒤에 배포했다.
 - **러너 메모리 여유가 작다.** GitHub 러너는 16GB인데 컴파일이 최대 12GB를 쓴다. 의존성이 늘면 메모리 부족으로 빌드가 실패할 수 있다. 그러면 `-J-Xmx`로 빌드 메모리를 제한하거나 더 큰 러너를 써야 한다.
 - **실패하면 배포 전체가 멈춘다.** publish의 배포 단계는 모든 앱의 빌드가 성공해야 돈다. native 빌드가 실패하면 6개 앱 모두 그 push에서 배포되지 않는다. 그래서 PR CI에서 native를 미리 빌드하게 했고, 그만큼 PR CI가 길어졌다.
-- **캐시 효과가 적다.** Gradle 캐시는 컴파일 결과를 재사용하지만, native 컴파일은 매번 처음부터 한다. 문서만 바꾼 커밋도 이 앱이 테스트 대상이 되면 14분을 다시 쓴다.
+- **캐시 효과가 적다.** Gradle 캐시는 컴파일 결과를 재사용하지만, native 컴파일은 매번 처음부터 한다. 문서만 바꾼 커밋도 이 앱이 테스트 대상이 되면 13분 넘게 다시 쓴다.
 
 ### 8.3 개발과 유지보수
 
