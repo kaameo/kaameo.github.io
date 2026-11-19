@@ -1,0 +1,31 @@
+/* 범례: 그림의 선·글자 색이 누가 하는 일인지 나타낸다. 글자도 같은 색으로 쓴다. */
+.cycle .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cycle .legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.swatch {
+  width: 16px;
+  height: 2px;
+}
+
+/* 좁은 화면에서는 SVG가 절반 가까이 줄어 글자가 6px 안팎이 된다. 글자 크기만 키워서, 줄어든 뒤에도 10px 남짓 되게 한다.
+   CSS의 font-size가 SVG의 fontSize 속성보다 우선한다. 라벨 사이 간격과 viewBox 여백은 이 크기에서도 겹치거나 잘리지 않게 잡았다. */
+@media (max-width: 640px) {
+  .cycle .svg text {
+    font-size: 20px;
+  }
+}

@@ -1,0 +1,50 @@
+/* 3절 그래프(ReviewChart.tsx)의 안쪽. 테두리·제목·설명은 전역 .figure(src/components/Figure.tsx)가 맡는다.
+   막대의 바탕(track)이 100%이고, 값 칸은 폭을 고정해 모든 막대의 길이 기준을 맞춘다. */
+
+.groups {
+  display: grid;
+  gap: 16px;
+}
+
+.name {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2.5em 1fr 11em;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.period {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.track {
+  height: 12px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bar {
+  display: block;
+  height: 100%;
+}
+
+.value {
+  color: var(--muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.value strong {
+  color: var(--fg);
+  font-weight: 600;
+}
