@@ -12,8 +12,12 @@ updates:
     # 보안 업데이트는 이 대기 없이 바로 PR이 열린다.
     cooldown:
       default-days: 7
-    # minor·patch는 PR 하나로 묶고, major는 따로 연다.
+    # next와 @next/*(mdx, third-parties)는 버전을 맞춰야 해서 major까지 한 PR로 묶는다.
+    # 패키지는 처음 맞는 그룹에 들어가므로 이 그룹을 위에 둔다.
+    # 그 밖의 minor·patch는 PR 하나로 묶고, major는 따로 연다.
     groups:
+      nextjs:
+        patterns: ["next", "@next/*"]
       npm-minor-patch:
         update-types: [minor, patch]
     commit-message:

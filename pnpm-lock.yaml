@@ -173,7 +173,7 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1
       '@next/mdx':
-        specifier: 16.4.6
+        specifier: ^16.4.6
         version: 16.4.6(@mdx-js/loader@3.1.1)
       '@next/third-parties':
         specifier: ^16.4.6
