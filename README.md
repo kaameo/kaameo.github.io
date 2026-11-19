@@ -13,11 +13,11 @@ http://localhost:3000 에서 확인합니다. 배포될 결과물을 그대로 �
 
 ## 글 쓰기
 
-`content/posts/글-주소.md` 파일을 만듭니다. 파일 이름이 주소가 됩니다 (`/posts/글-주소/`).
+`content/posts/글-주소.mdx` 파일을 만듭니다. 파일 이름이 주소가 됩니다 (`/posts/글-주소/`). 감상평(`content/books/`)과 Portfolio 사례(`content/portfolio/`)도 같은 `.mdx`입니다.
 
 `pnpm new:post 글-주소 "글 제목"`을 실행하면 오늘 날짜가 들어간 뼈대 파일이 `draft: true` 상태로 만들어집니다.
 
-```md
+```mdx
 ---
 title: 글 제목
 date: 2026-10-11
@@ -30,69 +30,37 @@ draft: false
 언어를 적은 코드 블록(```ts)에는 색 구분과 복사 버튼이 붙습니다.
 ```
 
-`draft: true`로 두면 사이트에 나오지 않습니다.
+`draft: true`로 두면 사이트에 나오지 않습니다. 다만 초안도 빌드 때 컴파일되므로, MDX 문법이 틀린 초안이 있으면 배포 빌드가 멈춥니다. 커밋 전에 `pnpm dev`에서 열어 확인합니다.
 
-### 그래프 넣기
+`.mdx`는 마크다운 안에 JSX를 쓸 수 있는 형식이라, 코드 밖에서 글자 바로 앞에 붙은 `<`(예: `Map<String>`)와 `{`는 JSX로 읽힙니다. `p99 < 200ms`처럼 뒤에 공백이 있는 `<`는 괜찮습니다. 글자로 쓰려면 백틱으로 감싸거나 `\<`, `\{`로 씁니다. 틀리면 빌드가 멈춥니다.
 
-언어를 `chart`로 적은 코드 블록에 JSON을 쓰면 가로 누적 막대 그래프로 그려집니다. 빌드 때 HTML로 그려지고 다크 모드를 따라갑니다. Obsidian이나 GitHub에서는 그냥 코드 블록으로 보입니다.
+### 그림 넣기
 
-````md
-```chart
-{
-  "title": "그래프 제목",
-  "unit": "MiB",
-  "series": [
-    { "name": "heap 사용" },
-    { "name": "heap 상한까지 빈 공간", "track": true },
-    { "name": "off-heap" }
-  ],
-  "rows": [
-    { "label": "billing", "values": [95, 166, 285], "limit": 448 }
-  ],
-  "caption": "그래프 아래에 붙일 설명(선택)"
-}
+그래프·배치도 같은 그림은 컴포넌트로 그려 본문에 넣습니다. 그 글에서만 쓰는 그림이면 파일 하나 대신 폴더를 만들고 본문을 `index.mdx`에 씁니다. 주소는 폴더 이름입니다.
+
 ```
-````
-
-- `series`는 순서대로 색이 정해집니다(색이 있는 series는 4개까지). `"track": true`는 바로 앞 series의 비어 있는 부분이라 같은 색을 옅게 씁니다.
-- series가 하나면 범례를 그리지 않습니다. 제목에 무엇을 그렸는지 적어 주세요.
-- `values`는 `series`와 같은 순서와 개수로 씁니다. `limit`(선택)을 주면 세로선과 초과량이 표시됩니다. 선 이름은 `limitLabel`로 바꿀 수 있습니다(기본값 `limit`).
-- 그 줄에 해당하지 않는 series는 `null`로 씁니다(막대에 그리지 않고 표에는 `-`). JVM·native를 줄을 나눠 나란히 비교할 때처럼 `[379, null]`, `[null, 208]`로 씁니다.
-- JSON이 틀리면 빌드가 멈추고 어디가 틀렸는지 알려 줍니다.
-
-### 배치도 넣기
-
-언어를 `cluster`로 적으면 노드(서버)마다 카드 하나를 그리고, 그 안에 묶음별로 pod를 나열합니다. 넓은 화면에서는 카드가 나란히 놓입니다.
-노드에 `capacity`를 주면 pod를 `value`에 비례하는 블록으로 이어 붙인 막대도 그립니다.
-
-````md
-```cluster
-{
-  "title": "배치도 제목",
-  "unit": "Mi",
-  "valueLabel": "limit 합계",
-  "capacityLabel": "할당 가능",
-  "restLabel": "그 밖의 pod·빈 자리",
-  "entry": ["인터넷 (HTTPS 443)", "EIP", "Envoy Gateway proxy"],
-  "nodes": [
-    {
-      "name": "t3.large",
-      "details": ["k3s server", "노드 라벨 core-data"],
-      "capacity": 7818,
-      "groups": [
-        { "name": "데이터", "color": 2, "items": [{ "name": "PostgreSQL", "value": 768 }] }
-      ]
-    }
-  ],
-  "caption": "그림 아래에 붙일 설명(선택)"
-}
+content/posts/글-주소/
+  index.mdx        본문
+  MyFigure.tsx     이 글에서만 쓰는 그림
+  data.ts          그림에 넣을 값(선택)
 ```
-````
 
-- `entry`(선택)는 요청이 들어오는 길을 화살표로 잇습니다.
-- 묶음의 `color`는 1~4(그래프와 같은 색 순서)이고, 빼면 회색입니다. 노드가 달라도 같은 묶음에는 같은 번호를 씁니다.
-- `value`(선택)는 숫자로 쓰고 `unit`이 뒤에 붙습니다. `note`(선택)는 이름 옆에 흐리게 붙습니다.
-- `capacity`(선택)를 주면 막대 위에 "`valueLabel` 합 / `capacityLabel` 용량 · 비율"이 붙고, 용량까지 남는 부분은 회색 블록(`restLabel`)이 됩니다. 막대 길이는 가장 큰 노드에 맞춰서 노드끼리도 같은 축척입니다.
+```mdx
+import MyFigure from "./MyFigure";
+import { latency } from "./data";
+
+본문은 마크다운으로 씁니다.
+
+<MyFigure {...latency} />
+```
+
+- 예시: `content/posts/ai-hiring-triangle/`(SVG 그림), `content/posts/graalvm-native-image-migration/`(가로 누적 막대 그래프 `Chart`, 노드별 배치도 `Cluster`).
+- 그림에 넣을 값이 길면 `data.ts`에 타입을 붙여 둡니다. MDX 안에 직접 쓴 props는 타입 검사를 받지 않습니다.
+- 그림은 `src/components/Figure.tsx`로 감싸면 테두리·제목·설명이 그래프와 같은 모양이 됩니다.
+- 그 그림에만 쓰는 스타일은 같은 폴더의 `그림이름.module.css`(CSS Modules)에 둡니다. `globals.css`에는 여러 글이 같이 쓰는 스타일만 둡니다.
+- 색은 `var(--fg)`, `var(--muted)`, `var(--line)`, `var(--chart-1)`~`var(--chart-4)`를 `style`로 주면 다크 모드를 따라갑니다. 빌드 때 HTML로 그려져 JS가 없습니다.
+- 슬라이더처럼 상태가 있는 그림은 그 파일 맨 위에 `"use client"`를 붙입니다. MDX 본문 안에서는 클라이언트 컴포넌트를 만들 수 없습니다.
+- 같은 그림을 세 번째 글에서도 쓰게 되면 그때 `src/components`로 옮기고, 각 글에서는 `@/components/...`로 import합니다.
 
 `pnpm dev`에서는 `draft: true`인 글도 주소로 열 수 있습니다(목록에는 나오지 않고, 제목 아래에 "초안" 표시가 붙습니다). 빌드 결과에는 들어가지 않습니다.
 
@@ -104,7 +72,7 @@ draft: false
 | Resume | `src/data/resume.ts` |
 | Resume PDF | `public/hong-jinsu_resume.pdf` (이력서 저장소의 `resume.html`을 Chrome으로 출력. 사진과 PROJECTS 안내는 빼고, EXPERIENCE 안내는 "자세한 내용은 포트폴리오를 참고해 주세요."로 바꿔 `https://kaameo.github.io/portfolio/`에 연결한다) |
 | Portfolio 프로젝트 개요와 순서 | `src/data/projects.ts` |
-| Portfolio 사례(Case) | `content/portfolio/*.md` |
+| Portfolio 사례(Case) | `content/portfolio/*.mdx` |
 | 사례 본문 이미지 | `public/portfolio/` |
 | Home 프로필 사진 | `public/profile.jpg` 파일을 넣으면 자동으로 보입니다 |
 

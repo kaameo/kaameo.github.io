@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllCases, getCase } from "@/lib/portfolio";
-import { renderMarkdown } from "@/lib/markdown";
+import { loadCaseBody } from "@/lib/mdx";
 
 type Params = { slug: string };
 
@@ -24,7 +24,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
   const item = getCase(slug);
   if (!item) notFound();
 
-  const body = await renderMarkdown(item.content);
+  const Body = await loadCaseBody(item.slug);
   const { project } = item;
 
   return (
@@ -40,7 +40,9 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
         <h1>{item.title}</h1>
       </header>
 
-      <div className="prose">{body}</div>
+      <div className="prose">
+        <Body />
+      </div>
     </article>
   );
 }

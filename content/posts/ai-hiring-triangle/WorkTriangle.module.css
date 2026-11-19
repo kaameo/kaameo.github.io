@@ -1,0 +1,7 @@
+/* 좁은 화면에서는 SVG가 절반 가까이 줄어 글자가 6px 안팎이 된다. 글자 크기만 키워서, 줄어든 뒤에도 10px 남짓 되게 한다.
+   CSS의 font-size가 SVG의 fontSize 속성보다 우선한다. viewBox 여백은 이 크기에서도 글자가 잘리지 않게 잡았다. */
+@media (max-width: 640px) {
+  .svg text {
+    font-size: 22px;
+  }
+}

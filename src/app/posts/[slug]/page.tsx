@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Comments from "@/components/Comments";
 import { getAllPosts, getPost, getPostSlugs } from "@/lib/posts";
-import { renderMarkdown } from "@/lib/markdown";
+import { loadPostBody } from "@/lib/mdx";
 import { formatDot, formatLong } from "@/lib/date";
 
 type Params = { slug: string };
@@ -28,7 +28,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const post = getPost((await params).slug);
   if (!post) notFound();
 
-  const body = await renderMarkdown(post.content);
+  const Body = await loadPostBody(post.slug, post.folder);
   const others = getAllPosts()
     .filter((p) => p.slug !== post.slug)
     .slice(0, 3);
@@ -57,7 +57,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             </ul>
           )}
         </header>
-        <div className="prose">{body}</div>
+        <div className="prose">
+          <Body />
+        </div>
       </article>
 
       <div className="post-after">

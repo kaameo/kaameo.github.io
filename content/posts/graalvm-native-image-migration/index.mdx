@@ -6,6 +6,10 @@ tags: ["Spring Boot", "GraalVM", "JVM", "Kubernetes"]
 draft: false
 ---
 
+import Chart from "./Chart";
+import Cluster from "./Cluster";
+import { k3sCluster, workingSet7d, heapAtMax, rssComparison, limitReduction, ciJobTime } from "./data";
+
 ## TL;DR
 
 - AWS EC2 두 대(t3.large 8GiB + t3.medium 4GiB)로 만든 k3s 클러스터에 Spring Boot 앱 6개와 데이터·관측성 인프라가 꽉 차 있었다. AI·검색·알림 기능을 더 올려야 했는데, 앱 하나를 띄울 메모리도 남아 있지 않았다.
@@ -50,56 +54,7 @@ draft: false
 
 이 두 대로 k3s 클러스터 하나를 만들었다. 아래는 2026-11-03 기준 limit이다.
 
-```cluster
-{
-  "title": "EC2 두 대로 만든 k3s 클러스터 (2026-11-03 기준 memory limit)",
-  "unit": "Mi",
-  "valueLabel": "limit 합계",
-  "capacityLabel": "할당 가능",
-  "restLabel": "그 밖의 pod·빈 자리",
-  "entry": ["인터넷 (HTTPS 443)", "t3.large EIP", "Envoy Gateway proxy"],
-  "nodes": [
-    {
-      "name": "t3.large",
-      "details": ["k3s server", "노드 라벨 core-data"],
-      "capacity": 7818,
-      "groups": [
-        { "name": "데이터", "color": 2, "items": [
-          { "name": "PostgreSQL", "value": 768 },
-          { "name": "Kafka", "value": 700 },
-          { "name": "Redis", "value": 64 },
-          { "name": "Elasticsearch", "value": 1536 }
-        ] },
-        { "name": "앱", "color": 1, "items": [
-          { "name": "member", "value": 512 },
-          { "name": "appearance", "value": 576 },
-          { "name": "billing", "value": 448 }
-        ] }
-      ]
-    },
-    {
-      "name": "t3.medium",
-      "details": ["k3s agent", "노드 라벨 app-observe"],
-      "capacity": 3832,
-      "groups": [
-        { "name": "앱", "color": 1, "items": [
-          { "name": "lecture", "value": 640 },
-          { "name": "customer-support", "value": 448 },
-          { "name": "chat", "value": 576 }
-        ] },
-        { "name": "관측성", "color": 3, "items": [
-          { "name": "Prometheus", "value": 416 },
-          { "name": "Loki", "value": 256 },
-          { "name": "Tempo", "value": 160 },
-          { "name": "Grafana", "value": 448 },
-          { "name": "Alloy", "value": 192 }
-        ] }
-      ]
-    }
-  ],
-  "caption": "막대 전체는 노드의 할당 가능 메모리, 색 블록은 pod 하나의 memory limit이다. 회색은 여기 적지 않은 pod(operator·관리 도구 등)와 빈 자리다."
-}
-```
+<Cluster {...k3sCluster} />
 
 stateful 워크로드(DB·Kafka·ES)는 large에 고정했다. 앱 일부와 관측성 스택은 medium에 뒀다. dev 브랜치에 병합하면 GitHub Actions가 바뀐 앱의 이미지를 만들어 k3s에 자동으로 배포한다.
 
@@ -129,22 +84,7 @@ Spring Boot 앱 하나는 400~500MiB가 필요하다. 세 개를 따로 띄우�
 
 같은 날 Grafana에 "앱 개요" dashboard(#601)를 만들어 6개 앱을 한 화면에 놓고 보니 상황이 더 분명해졌다.
 
-```chart
-{
-  "title": "7일 최대 working set: 6개 앱 모두 limit의 85% 이상을 쓰고 있었다",
-  "unit": "Mi",
-  "series": [{ "name": "7일 최대 working set" }],
-  "rows": [
-    { "label": "billing · 100%", "values": [448], "limit": 448 },
-    { "label": "lecture · 92%", "values": [589], "limit": 640 },
-    { "label": "customer-support · 90%", "values": [404], "limit": 448 },
-    { "label": "member · 89%", "values": [456], "limit": 512 },
-    { "label": "appearance · 89%", "values": [510], "limit": 576 },
-    { "label": "chat · 85%", "values": [492], "limit": 576 }
-  ],
-  "caption": "Grafana \"앱 개요\" dashboard(#601)에서 2026-11-03에 본 7일 최대값이다. 라벨 옆 숫자는 limit 대비 사용률이다."
-}
-```
+<Chart {...workingSet7d} />
 
 billing-app은 working set이 limit에 붙어 있었다(RSS 기준 7일 최대 444Mi). Grafana도 448Mi 중 418Mi(93%)까지 올라가 있었다. OOMKilled는 7일 동안 없었다. 그래도 여유가 거의 없어서 둘은 바로 512Mi로 올렸다(#608). 그 결과 남은 공간은 더 줄었다. medium의 request 여유는 248Mi가 됐다.
 
@@ -181,26 +121,7 @@ off-heap을 다시 쪼개면 다음과 같다. Metaspace와 코드 캐시는 Mic
 1. **JVM 앱 하나는 off-heap으로만 280~355MiB를 상시 쓴다.** Metaspace와 코드 캐시는 앱이 뜨면 거의 그대로 유지된다. native는 스레드 수와 부하에 따라 조금씩 변한다. 앱을 하나 더 띄울 때마다 이 비용을 다시 낸다.
 2. **`-XX:MaxRAMPercentage=60` 설정이 위험하게 잡혀 있었다.** heap 상한과 off-heap을 더하면 6개 앱 모두에서 limit을 76~119MiB 넘었다. billing-app이면 heap 상한 261 + off-heap 285 = 546MiB로, 448Mi limit보다 크다. 트래픽이 늘어 heap이 상한 쪽으로 커지면 cgroup OOMKill 위험이 컸다.
 
-```chart
-{
-  "title": "heap이 상한까지 차면 6개 앱 모두 limit을 넘는다",
-  "unit": "MiB",
-  "series": [
-    { "name": "heap 사용(7일 최대)" },
-    { "name": "heap 상한까지 빈 공간", "track": true },
-    { "name": "off-heap" }
-  ],
-  "rows": [
-    { "label": "billing", "values": [95, 166, 285], "limit": 448 },
-    { "label": "customer-support", "values": [82, 179, 280], "limit": 448 },
-    { "label": "member", "values": [90, 208, 333], "limit": 512 },
-    { "label": "appearance", "values": [110, 224, 318], "limit": 576 },
-    { "label": "chat", "values": [103, 231, 335], "limit": 576 },
-    { "label": "lecture", "values": [154, 217, 355], "limit": 640 }
-  ],
-  "caption": "heap 상한은 -XX:MaxRAMPercentage=60 기준, off-heap은 RSS − heap committed(측정 시점)다. 막대 끝은 heap이 상한까지 찼을 때의 합이다."
-}
-```
+<Chart {...heapAtMax} />
 
 참고로 JVM은 CPU가 2개 미만이거나 메모리가 1,792MB 미만이면 "server class"가 아니라고 보고 Serial GC를 고른다. 운영 컨테이너는 메모리 조건에 걸려 Serial GC였다(지표 `gc=Copy`, `MarkSweepCompact`). GC 정지 비율은 0%에 가까웠다. GC는 문제가 아니었다.
 
@@ -389,22 +310,7 @@ native에도 `-XX:ActiveProcessorCount=2`를 줬다.
 
 기동은 JVM 4.3초, native 0.57초로 약 1/7이었다. RSS는 세 시점 모두 native가 44~45% 작았다.
 
-```chart
-{
-  "title": "같은 조건에서 잰 RSS: native가 44~45% 작다",
-  "unit": "Mi",
-  "series": [{ "name": "JVM" }, { "name": "native" }],
-  "rows": [
-    { "label": "기동 20초 뒤 · JVM", "values": [379, null] },
-    { "label": "기동 20초 뒤 · native (−45%)", "values": [null, 208] },
-    { "label": "작업 직후 · JVM", "values": [413, null] },
-    { "label": "작업 직후 · native (−44%)", "values": [null, 231] },
-    { "label": "60초 idle 뒤 · JVM", "values": [415, null] },
-    { "label": "60초 idle 뒤 · native (−44%)", "values": [null, 233] }
-  ],
-  "caption": "macOS arm64 로컬에서 같은 jar·실행 파일, 같은 인프라, 같은 작업으로 쟀다. JVM은 Serial GC·CPU 2개·heap 상한 448Mi×60%로 운영 조건에 맞췄다."
-}
-```
+<Chart {...rssComparison} />
 
 처음에는 GC·CPU 조건을 맞추지 않고 쟀다. 그때는 JVM 390/419/415Mi, native 210/236/208Mi로 차이가 44~50%였다. 리뷰에서 "로컬 JVM은 CPU가 많아 G1을 골랐을 수 있다"는 지적을 받고 조건을 맞춰 다시 쟀다. 결과는 큰 차이가 없었다.
 
@@ -467,18 +373,7 @@ medium 노드 전체 사용량은 2,894Mi(75%, 11-03)에서 2,667Mi(69%, 11-04 0
 
 medium 노드의 스케줄러 요청 합계는 이 변경으로 192Mi 줄었다(3,712 → 3,520Mi, 할당 가능 3,832Mi의 96% → 92%).
 
-```chart
-{
-  "title": "working set이 줄어 limit을 448Mi에서 256Mi로 낮췄다",
-  "unit": "Mi",
-  "series": [{ "name": "working set 최대" }],
-  "rows": [
-    { "label": "JVM · 7일 최대", "values": [404], "limit": 448 },
-    { "label": "native · 256Mi 적용 뒤 약 17시간 최대", "values": [123], "limit": 256 }
-  ],
-  "caption": "customer-support-app의 working set 최대와 memory limit(= request)이다. JVM은 전환 전 7일, native는 256Mi·-Xmx128m 적용 뒤 약 17시간의 값이라 잰 기간이 다르다. 같은 조건 비교는 7.1에 있다. limit을 낮춘 192Mi만큼 medium 노드에 request 자리가 생겼다."
-}
-```
+<Chart {...limitReduction} />
 
 ### 7.5 결정: 넓히지 않고 한 앱만 유지한다
 
@@ -519,22 +414,7 @@ customer-support-app은 native로 유지하고, 다른 앱으로 넓히는 것�
 |native 컴파일 최대 메모리|CI 11.65~12.19GB, 로컬 9.38GB|빌드 출력 `Peak RSS`(위 CI 링크)|
 |native 컴파일 단계별(첫 빌드)|분석 164초, 메서드 컴파일 342초, 기타|[1차 CI](https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/actions/runs/41588071359/job/125758375245) 빌드 출력 `[2/8]`~`[8/8]`|
 
-```chart
-{
-  "title": "같은 CI run에서 이 앱 job만 13분을 넘었다",
-  "unit": "분",
-  "series": [{ "name": "테스트·jar 빌드 등" }, { "name": "native 컴파일·이미지 확인" }],
-  "rows": [
-    { "label": "customer-support", "values": [2.3, 11.0] },
-    { "label": "billing", "values": [5.7, null] },
-    { "label": "chat", "values": [5.2, null] },
-    { "label": "member", "values": [4.5, null] },
-    { "label": "appearance", "values": [3.8, null] },
-    { "label": "lecture", "values": [3.2, null] }
-  ],
-  "caption": "2026-11-03 최종 CI run(a20d350c)의 job별 시작~끝 시각이다. customer-support는 GraalVM 설치부터 native 이미지 빌드 확인까지(10분 57초)를 native 단계로 묶었다."
-}
-```
+<Chart {...ciJobTime} />
 
 이 시간이 실제로 어떤 영향을 주는지는 다음과 같다.
 

@@ -1,6 +1,6 @@
 // Portfolio에 보여 줄 Project 개요. 배열 순서가 화면 순서다.
 // 이력서 저장소의 work_experience.md(Company의 Project)와 portfolio.md(그 밖의 Project)를 옮겼다.
-// content/portfolio/*.md Case의 project 값이 여기 slug와 같아야 한다.
+// content/portfolio/*.mdx Case의 project 값이 여기 slug와 같아야 한다.
 
 type Link = { label: string; href: string };
 

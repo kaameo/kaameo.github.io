@@ -1,0 +1,136 @@
+/* 가로 누적 막대 그래프(Chart.tsx)의 안쪽. 테두리·제목·설명은 전역 .figure(src/components/Figure.tsx)가 맡는다.
+   막대는 24px보다 얇게, 조각 사이는 2px 띄우고, 끝만 둥글게 한다. */
+
+.chart .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.chart .legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.swatchLine {
+  width: 2px;
+  height: 14px;
+  background: var(--fg);
+}
+
+.rows {
+  display: grid;
+  gap: 14px;
+}
+
+.rowHead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 12px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.label {
+  font-weight: 500;
+}
+
+.value {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.value strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.track {
+  position: relative;
+  height: 20px;
+}
+
+.grid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+.bar {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  height: 100%;
+}
+
+.seg {
+  flex-basis: 0;
+  min-width: 2px;
+}
+
+.seg:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.limit {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--fg);
+}
+
+.axis {
+  position: relative;
+  height: 20px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.axis span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.axis span:first-child {
+  transform: none;
+}
+
+.axis span:last-child {
+  transform: translateX(-100%);
+}
+
+.table summary {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chart .table table {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}

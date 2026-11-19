@@ -9,15 +9,15 @@ if (!slugArg) {
   process.exit(1);
 }
 
-const slug = slugArg.replace(/\.md$/, "");
+const slug = slugArg.replace(/\.mdx?$/, "");
 if (/[\s/\\]/.test(slug)) {
   console.error("책 주소에는 공백이나 슬래시를 쓸 수 없습니다. 하이픈(-)으로 이어 주세요.");
   process.exit(1);
 }
 
-const file = fileURLToPath(new URL(`../content/books/${slug}.md`, import.meta.url));
+const file = fileURLToPath(new URL(`../content/books/${slug}.mdx`, import.meta.url));
 if (existsSync(file)) {
-  console.error(`이미 있는 책입니다: content/books/${slug}.md`);
+  console.error(`이미 있는 책입니다: content/books/${slug}.mdx`);
   process.exit(1);
 }
 
@@ -46,6 +46,6 @@ draft: true
 `,
 );
 
-console.log(`만들었습니다: content/books/${slug}.md`);
+console.log(`만들었습니다: content/books/${slug}.mdx`);
 console.log(`표지는 public/books/${slug}.jpg 에 넣어 주세요. 없으면 빌드가 실패합니다.`);
 console.log("다 쓰면 draft: true 줄을 지우거나 false로 바꿔야 사이트에 나옵니다.");

@@ -13,12 +13,11 @@ export type Book = {
   cover: string;
   date: string;
   link: string;
-  content: string;
 };
 
 function readBook(file: string): Book | null {
   const raw = fs.readFileSync(path.join(BOOKS_DIR, file), "utf8");
-  const { data, content } = matter(raw);
+  const { data } = matter(raw);
   if (data.draft) return null;
 
   const cover = String(data.cover ?? "");
@@ -28,13 +27,12 @@ function readBook(file: string): Book | null {
   }
 
   return {
-    slug: file.replace(/\.md$/, ""),
+    slug: file.replace(/\.mdx$/, ""),
     title: String(data.title ?? ""),
     author: String(data.author ?? ""),
     cover,
     date: normalizeDate(data.date),
     link: String(data.link ?? ""),
-    content,
   };
 }
 
@@ -43,7 +41,7 @@ let cache: Book[] | null = null;
 // 작성일 기준 최신순
 export function getAllBooks(): Book[] {
   if (cache) return cache;
-  const files = fs.existsSync(BOOKS_DIR) ? fs.readdirSync(BOOKS_DIR).filter((f) => f.endsWith(".md")) : [];
+  const files = fs.existsSync(BOOKS_DIR) ? fs.readdirSync(BOOKS_DIR).filter((f) => f.endsWith(".mdx")) : [];
   cache = files
     .map(readBook)
     .filter((b): b is Book => b !== null)

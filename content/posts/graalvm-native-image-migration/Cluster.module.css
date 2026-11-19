@@ -1,0 +1,159 @@
+/* 노드별 배치도(Cluster.tsx). 노드마다 카드 하나, 넓은 화면에서는 나란히 놓는다. */
+
+.cluster {
+  margin: 32px 0;
+}
+
+.cluster .title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.cluster .entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.cluster .entry li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.entry li + li::before {
+  content: "→";
+  color: var(--muted);
+}
+
+.pill {
+  padding: 2px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.nodes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.node {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.nodeHead {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 4px;
+}
+
+.nodeName {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.nodeDetail {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* capacity 막대: 전체 폭 = 노드 용량, 블록 폭 = pod의 value. 조각 사이는 2px 띄우고, 남는 부분은 옅은 회색이다. */
+.usage {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 12px;
+  margin: 12px 0 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.usage strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.bar {
+  display: flex;
+  gap: 2px;
+  height: 28px;
+}
+
+.block {
+  flex-basis: 0;
+  min-width: 2px;
+  border-radius: 4px;
+}
+
+.rest {
+  background: var(--soft);
+}
+
+.group {
+  margin-top: 14px;
+}
+
+.groupName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.cluster .items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cluster .items li {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+  margin: 0;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: var(--soft);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.value,
+.itemNote {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cluster .caption {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}

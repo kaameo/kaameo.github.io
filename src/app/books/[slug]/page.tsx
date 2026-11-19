@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Comments from "@/components/Comments";
 import { getAllBooks, getBook, storeName } from "@/lib/books";
-import { renderMarkdown } from "@/lib/markdown";
+import { loadBookBody } from "@/lib/mdx";
 import { formatLong } from "@/lib/date";
 
 type Params = { slug: string };
@@ -26,7 +26,7 @@ export default async function BookPage({ params }: { params: Promise<Params> }) 
   const book = getBook((await params).slug);
   if (!book) notFound();
 
-  const body = await renderMarkdown(book.content);
+  const Body = await loadBookBody(book.slug);
 
   return (
     <>
@@ -42,7 +42,9 @@ export default async function BookPage({ params }: { params: Promise<Params> }) 
             {book.link && <a href={book.link}>{storeName(book.link)} ↗</a>}
           </div>
         </header>
-        <div className="prose">{body}</div>
+        <div className="prose">
+          <Body />
+        </div>
       </article>
 
       <div className="post-after">

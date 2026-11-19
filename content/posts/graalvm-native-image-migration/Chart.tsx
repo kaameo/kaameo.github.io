@@ -1,19 +1,15 @@
-// 마크다운의 ```chart 블록(JSON)을 가로 누적 막대 그래프로 그린다.
+// 가로 누적 막대 그래프. 이 글(index.mdx)에서만 쓰고, 값은 data.ts에 둔다.
 // 빌드 때 HTML로 그려지므로 JS가 없고, 색은 CSS 변수라 테마 토글을 그대로 따라간다.
-import {
-  formatNumber as format,
-  isNumber,
-  isObject,
-  parseSpecObject,
-  specError,
-} from "@/lib/figure-spec";
+// 테두리·제목·설명은 Figure가 그리고, 그래프 안쪽 스타일은 Chart.module.css에 둔다.
+import Figure from "@/components/Figure";
+import styles from "./Chart.module.css";
 
 type Series = { name: string; track?: boolean };
 // null은 그 항목에 해당 series가 없다는 뜻이다(막대에 안 그리고 표에는 "-"로 쓴다).
 // JVM·native를 다른 줄에 나란히 놓을 때처럼, 줄마다 series 하나만 쓰는 비교에 쓴다.
 type Value = number | null;
 type Row = { label: string; values: Value[]; limit?: number };
-type Spec = {
+export type ChartProps = {
   title: string;
   unit?: string;
   series: Series[];
@@ -25,60 +21,20 @@ type Spec = {
 // 카테고리 색은 순서대로만 쓴다(globals.css의 --chart-1 ~ --chart-4).
 const MAX_SLOTS = 4;
 
-function fail(message: string): never {
-  return specError("chart", message);
-}
+const format = new Intl.NumberFormat("ko-KR").format;
 
-function parseSpec(source: string): Spec {
-  const { title, unit, series, rows, limitLabel, caption } = parseSpecObject(
-    "chart",
-    source,
-  );
-
-  if (typeof title !== "string" || !title) fail("title이 필요합니다.");
-  if (!Array.isArray(series) || series.length === 0)
-    fail("series가 비어 있습니다.");
-  if (!Array.isArray(rows) || rows.length === 0) fail("rows가 비어 있습니다.");
-
-  const parsedSeries = series.map((s, i): Series => {
-    if (!isObject(s) || typeof s.name !== "string")
-      fail(`series[${i}]에 name이 필요합니다.`);
-    if (s.track === true && i === 0)
-      fail(
-        "첫 series는 track일 수 없습니다. track은 바로 앞 series의 남은 부분입니다.",
-      );
-    return { name: s.name, track: s.track === true };
-  });
-  if (parsedSeries.filter((s) => !s.track).length > MAX_SLOTS)
-    fail(`색이 있는 series는 ${MAX_SLOTS}개까지입니다.`);
-
-  const parsedRows = rows.map((r, i): Row => {
-    if (!isObject(r) || typeof r.label !== "string")
-      fail(`rows[${i}]에 label이 필요합니다.`);
-    const { values, limit } = r;
-    if (
-      !Array.isArray(values) ||
-      values.length !== parsedSeries.length ||
-      !values.every((v) => v === null || (isNumber(v) && v >= 0)) ||
-      values.every((v) => v === null)
-    ) {
-      fail(
-        `rows[${i}].values는 series 수(${parsedSeries.length})만큼의 0 이상 숫자(또는 null)여야 하고, 하나 이상은 숫자여야 합니다.`,
-      );
-    }
-    if (limit !== undefined && !(isNumber(limit) && limit > 0))
-      fail(`rows[${i}].limit은 양수여야 합니다.`);
-    return { label: r.label, values, limit };
-  });
-
-  return {
-    title,
-    unit: typeof unit === "string" ? unit : undefined,
-    series: parsedSeries,
-    rows: parsedRows,
-    limitLabel: typeof limitLabel === "string" ? limitLabel : "limit",
-    caption: typeof caption === "string" ? caption : undefined,
+// 타입으로 나타낼 수 없는 규칙만 확인한다. 어기면 그래프가 조용히 틀리게 그려지는 대신 빌드가 멈춘다.
+function check({ title, series, rows }: ChartProps) {
+  const fail = (message: string): never => {
+    throw new Error(`Chart "${title}": ${message}`);
   };
+  if (series[0]?.track) fail("첫 series는 track일 수 없습니다. track은 바로 앞 series의 남은 부분입니다.");
+  if (series.filter((s) => !s.track).length > MAX_SLOTS) fail(`색이 있는 series는 ${MAX_SLOTS}개까지입니다.`);
+  rows.forEach((r, i) => {
+    if (r.values.length !== series.length || r.values.every((v) => v === null)) {
+      fail(`rows[${i}].values는 series 수(${series.length})만큼 써야 하고, 하나 이상은 숫자여야 합니다.`);
+    }
+  });
 }
 
 // 눈금 간격을 1·2·2.5·5 × 10^n 중에서 골라 4칸 안팎으로 나눈다.
@@ -99,15 +55,9 @@ function niceScale(dataMax: number) {
 const sum = (values: Value[]) =>
   values.reduce<number>((a, b) => a + (b ?? 0), 0);
 
-export default function Chart({ source }: { source: string }) {
-  const {
-    title,
-    unit = "",
-    series,
-    rows,
-    limitLabel,
-    caption,
-  } = parseSpec(source);
+export default function Chart(props: ChartProps) {
+  check(props);
+  const { title, unit = "", series, rows, limitLabel = "limit", caption } = props;
 
   // track series는 바로 앞 series 색을 옅게 쓴다(같은 대상의 비어 있는 부분).
   let slot = 0;
@@ -130,15 +80,14 @@ export default function Chart({ source }: { source: string }) {
   const withUnit = (v: number) => `${format(v)}${unit}`;
 
   return (
-    <figure className="chart">
-      <figcaption className="chart-title">{title}</figcaption>
+    <Figure className={styles.chart} title={title} caption={caption}>
 
       {(legendSeries.length > 0 || hasLimit) && (
-        <ul className="chart-legend">
+        <ul className={styles.legend}>
           {legendSeries.map((s, i) => (
             <li key={s.name}>
               <span
-                className="chart-swatch"
+                className={styles.swatch}
                 style={{ background: colors[i] }}
                 aria-hidden="true"
               />
@@ -147,14 +96,14 @@ export default function Chart({ source }: { source: string }) {
           ))}
           {hasLimit && (
             <li>
-              <span className="chart-swatch-line" aria-hidden="true" />
+              <span className={styles.swatchLine} aria-hidden="true" />
               {limitLabel}
             </li>
           )}
         </ul>
       )}
 
-      <div className="chart-rows">
+      <div className={styles.rows}>
         {rows.map((row) => {
           const total = sum(row.values);
           const over = row.limit !== undefined ? total - row.limit : 0;
@@ -169,10 +118,10 @@ export default function Chart({ source }: { source: string }) {
           ].join(", ");
 
           return (
-            <div className="chart-row" key={row.label}>
-              <div className="chart-row-head">
-                <span className="chart-label">{row.label}</span>
-                <span className="chart-value">
+            <div key={row.label}>
+              <div className={styles.rowHead}>
+                <span className={styles.label}>{row.label}</span>
+                <span className={styles.value}>
                   {withUnit(total)}
                   {row.limit !== undefined && (
                     <>
@@ -184,24 +133,24 @@ export default function Chart({ source }: { source: string }) {
                 </span>
               </div>
               <div
-                className="chart-track"
+                className={styles.track}
                 role="img"
                 aria-label={`${row.label}: ${label}`}
               >
                 {ticks.map((t) => (
                   <span
                     key={t}
-                    className="chart-grid"
+                    className={styles.grid}
                     style={{ left: pct(t) }}
                     aria-hidden="true"
                   />
                 ))}
-                <div className="chart-bar" style={{ width: pct(total) }}>
+                <div className={styles.bar} style={{ width: pct(total) }}>
                   {row.values.map((v, i) =>
                     v ? (
                       <span
                         key={series[i].name}
-                        className="chart-seg"
+                        className={styles.seg}
                         style={{ flexGrow: v, background: colors[i] }}
                         title={`${series[i].name} ${withUnit(v)}`}
                       />
@@ -210,7 +159,7 @@ export default function Chart({ source }: { source: string }) {
                 </div>
                 {row.limit !== undefined && (
                   <span
-                    className="chart-limit"
+                    className={styles.limit}
                     style={{ left: pct(row.limit) }}
                     aria-hidden="true"
                   />
@@ -221,7 +170,7 @@ export default function Chart({ source }: { source: string }) {
         })}
       </div>
 
-      <div className="chart-axis" aria-hidden="true">
+      <div className={styles.axis} aria-hidden="true">
         {ticks.map((t) => (
           <span key={t} style={{ left: pct(t) }}>
             {format(t)}
@@ -229,7 +178,7 @@ export default function Chart({ source }: { source: string }) {
         ))}
       </div>
 
-      <details className="chart-table">
+      <details className={styles.table}>
         <summary>표로 보기{unit && ` (단위 ${unit})`}</summary>
         <table>
           <thead>
@@ -274,7 +223,6 @@ export default function Chart({ source }: { source: string }) {
         </table>
       </details>
 
-      {caption && <p className="chart-note">{caption}</p>}
-    </figure>
+    </Figure>
   );
 }

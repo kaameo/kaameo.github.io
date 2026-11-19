@@ -1,6 +1,6 @@
 // Resume 페이지 내용. 이력서 저장소(resume.html)와 같은 내용을 손으로 맞춘다.
 // summary와 project.intro는 여러 문단 마크다운(빈 줄로 문단 구분), 불릿(items)은 한 줄 마크다운으로 쓴다: **굵게**, [링크](url), `코드`.
-// 불릿을 { text, case }로 쓰면 끝에 Portfolio의 Case(content/portfolio/<case>.md)로 가는 "자세히 →" 링크가 붙는다.
+// 불릿을 { text, case }로 쓰면 끝에 Portfolio의 Case(content/portfolio/<case>.mdx)로 가는 "자세히 →" 링크가 붙는다.
 
 type Link = { label: string; href: string };
 export type Bullet = string | { text: string; case: string };
