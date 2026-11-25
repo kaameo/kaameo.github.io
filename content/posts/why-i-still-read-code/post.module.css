@@ -1,0 +1,4 @@
+.narrow img {
+  max-width: 600px;
+  margin-inline: auto;
+}
