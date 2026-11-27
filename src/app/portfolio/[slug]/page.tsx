@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import PrintButton from "@/components/PrintButton";
 import { getAllCases, getCase } from "@/lib/portfolio";
 import { loadCaseBody } from "@/lib/mdx";
 
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return { title: item.title, description: item.summary };
 }
 
-// Case 상세. 제목 위에 어느 Project의 Case인지 글자로 적는다.
+// Case 상세. 제목 위에 어느 Project의 Case인지 글자로 적는다. 다른 Case로는 Portfolio 사이드바(layout.tsx)에서 바로 간다.
 export default async function CasePage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const item = getCase(slug);
@@ -29,15 +29,14 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
 
   return (
     <article>
-      <Link href="/portfolio/" className="back-link">
-        ← Portfolio
-      </Link>
-
       <header className="pd-header">
         <p className="pd-kicker">
           <span className="pd-kicker-project">{project.title}</span> {project.subtitle}
         </p>
-        <h1>{item.title}</h1>
+        <div className="pd-title-row">
+          <h1>{item.title}</h1>
+          <PrintButton />
+        </div>
       </header>
 
       <div className="prose">

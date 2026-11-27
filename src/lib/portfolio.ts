@@ -59,3 +59,9 @@ export function getAllCases(): Case[] {
 export function getCase(slug: string): Case | undefined {
   return getAllCases().find((c) => c.slug === slug);
 }
+
+// Project마다 그 Case 목록. Portfolio 요약과 사이드바가 같은 묶음과 순서를 쓴다.
+export function getProjectsWithCases(): { project: Project; cases: Case[] }[] {
+  const cases = getAllCases();
+  return projects.map((project) => ({ project, cases: cases.filter((c) => c.project === project) }));
+}

@@ -18,6 +18,11 @@
     sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --max: 960px;
+  /* 레이아웃 폭: 좌우 여백, Portfolio 사이드바 영역(본문 왼쪽), 사이드바 목록과 세로선 사이, 본문 위 여백 */
+  --gutter: 24px;
+  --aside: 240px;
+  --aside-gap: 20px;
+  --page-top: 56px;
   color-scheme: light;
 }
 
@@ -87,9 +92,9 @@ img {
 }
 
 .container {
-  max-width: calc(var(--max) + 48px);
+  max-width: calc(var(--max) + 2 * var(--gutter));
   margin-inline: auto;
-  padding-inline: 24px;
+  padding-inline: var(--gutter);
 }
 
 /* ---------- Header ---------- */
@@ -97,7 +102,10 @@ img {
   border-bottom: 1px solid var(--line);
 }
 
+/* 헤더는 본문 양옆에 사이드바 영역만큼 더 넓다(240 + 960 + 240 = 1440). 화면 가운데에 좌우 대칭으로 놓여
+   로고가 Portfolio 사이드바 왼쪽 끝과 같은 줄에 오고, 모든 페이지에서 같은 자리라 탭을 옮겨도 움직이지 않는다. */
 .site-header .container {
+  max-width: calc(var(--max) + 2 * var(--aside) + 2 * var(--gutter));
   min-height: 64px;
   display: flex;
   flex-wrap: wrap;
@@ -189,8 +197,13 @@ img {
 }
 
 /* ---------- Layout ---------- */
+/* main과 푸터를 감싸는 상자(layout.tsx). Portfolio 사이드바가 이 상자를 기준으로 헤더 아래부터 페이지 끝까지 세로선을 긋는다. */
+.frame {
+  position: relative;
+}
+
 .page {
-  padding-block: 56px 48px;
+  padding-block: var(--page-top) 48px;
 }
 
 .site-footer .container {
@@ -844,35 +857,13 @@ img {
   color: var(--muted);
 }
 
-/* 페이지 제목 오른쪽에 PDF 다운로드 버튼을 둔다(Resume, Portfolio). 폭이 좁으면 버튼이 아래 줄로 내려간다. */
+/* Resume·Portfolio 제목 오른쪽 끝에 인쇄 버튼(아이콘)을 둔다. 폭이 좁으면 버튼이 아래 줄로 내려간다. */
 .title-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 12px 16px;
-}
-
-.pdf-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.pdf-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  font-size: 14px;
-  transition: background-color 0.15s ease;
-}
-
-.pdf-button:hover {
-  background-color: var(--hover);
 }
 
 .resume-contact {
@@ -906,8 +897,8 @@ img {
   letter-spacing: -0.015em;
 }
 
-/* 제목 오른쪽에 회색 안내(Experience → Portfolio)를 둘 때는 둘을 한 줄로 묶고, 가로줄과 간격은 줄이 맡는다.
-   안내를 h2 밖에 둬야 스크린 리더와 목차에서 제목이 "Experience"로만 읽힌다. */
+/* 제목 오른쪽에 회색 안내("자세한 내용은 포트폴리오를…")를 둘 때는 둘을 한 줄로 묶고, 가로줄과 간격은 줄이 맡는다.
+   안내를 h2 밖에 둬야 스크린 리더와 목차에서 제목만 읽힌다. */
 .titled-section-head {
   display: flex;
   flex-wrap: wrap;
@@ -952,6 +943,7 @@ img {
   gap: 2px 16px;
 }
 
+.item-head h2,
 .item-head h3 {
   margin: 0;
   font-size: 17px;
@@ -1093,23 +1085,95 @@ img {
 }
 
 /* ---------- Portfolio ---------- */
-/* Project마다 개요와 Case 제목 불릿을 두고, Case 하나가 상세 페이지 하나다.
-   섹션 제목, 이름·기간 줄은 Resume와 같은 규칙(.titled-section, .item-head)을 쓴다. */
+/* Portfolio 사이드바: 요약과 Case 상세에 함께 붙는다(portfolio/layout.tsx).
+   본문(--max)은 다른 페이지처럼 가운데에 두고, 사이드바 영역(--aside: 목록 + --aside-gap + 세로선 + --aside-gap)을 본문 바로 왼쪽에 붙인다.
+   화면이 넓어지면 그 왼쪽이 비고, 좁으면 왼쪽 여백(--gutter)을 지키려고 목록이 줄어든다.
+   .frame(main + 푸터)을 기준으로 놓아서 세로선이 헤더 아래부터 페이지 끝까지 이어지고, 50%는 화면 가운데다. */
+.pf-sidebar {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc(50% + var(--max) / 2 + var(--aside-gap));
+  width: min(
+    calc(var(--aside) - var(--aside-gap)),
+    calc(50% - var(--max) / 2 - var(--aside-gap) - var(--gutter))
+  );
+  padding: var(--page-top) calc(var(--aside-gap) - 1px) 0 0;
+  border-right: 1px solid var(--line);
+}
+
+/* --max + 2 × --aside. 미디어 쿼리는 변수를 읽지 못해 숫자로 적는다. */
+@media (min-width: 1440px) {
+  .pf-sidebar {
+    display: block;
+  }
+}
+
+.pf-nav,
+.pf-nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 목록은 sticky로 따라오고, 길면 세로로만 스크롤한다. overflow-y만 주면 가로도 스크롤할 수 있게 되므로 가로는 막는다. */
+.pf-nav {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 14px;
+}
+
+.pf-nav a {
+  display: block;
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.pf-nav a:hover,
+.pf-nav a[aria-current="page"] {
+  color: var(--fg);
+}
+
+.pf-nav-home,
+.pf-nav-project {
+  font-weight: 600;
+}
+
+.pf-nav-project + ul {
+  margin-top: 4px;
+}
+
+/* Case 제목은 길어서 여러 줄로 접힌다. 왼쪽 세로줄로 어느 Project의 Case인지 묶고, 보고 있는 Case는 줄을 굵게 강조한다.
+   줄이 굵어진 만큼 안쪽 여백을 줄여 글자 위치는 그대로 둔다. */
+.pf-nav .pf-nav-case {
+  padding: 3px 0 3px 12px;
+  border-left: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pf-nav .pf-nav-case[aria-current="page"] {
+  padding-left: 11px;
+  border-left: 2px solid var(--accent);
+  font-weight: 600;
+}
+
+/* Portfolio 요약: 제목 아래 Project를 차례로 나열한다. Project마다 개요와 Case 제목 불릿을 두고, Case 하나가 상세 페이지 하나다.
+   이름·기간 줄은 Resume와 같은 .item-head를 쓰고, Project마다 위에 가는 선을 긋는다. */
 .pf-project {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid var(--line);
   scroll-margin-top: 24px;
-}
-
-/* Experience 섹션 맨 위의 Company 소개. 아래 Project와는 Project 사이처럼 선으로 나눈다. */
-.pf-company + .pf-project {
-  margin-top: 40px;
-  padding-top: 40px;
-  border-top: 1px solid var(--line);
-}
-
-.pf-project + .pf-project {
-  margin-top: 40px;
-  padding-top: 40px;
-  border-top: 1px solid var(--line);
 }
 
 .pf-overview {
@@ -1180,19 +1244,8 @@ img {
   color: var(--accent);
 }
 
-.back-link {
-  display: inline-block;
-  margin-bottom: 40px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.back-link:hover {
-  color: var(--fg);
-}
-
 .pd-header {
+  --pd-title: 38px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1213,9 +1266,23 @@ img {
   color: var(--fg);
 }
 
+/* Case 제목 오른쪽 끝에 인쇄 버튼(아이콘). 제목이 여러 줄이면 버튼은 첫 줄 높이에 맞춘다. */
+.pd-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+/* 버튼(36px)을 제목 첫 줄(글자 크기 × 줄 높이 1.3) 가운데에 맞춘다. */
+.pd-title-row .icon-btn {
+  flex: none;
+  margin-top: calc((var(--pd-title) * 1.3 - 36px) / 2);
+}
+
 .pd-header h1 {
   margin: 0;
-  font-size: 38px;
+  font-size: var(--pd-title);
   line-height: 1.3;
   letter-spacing: -0.025em;
   text-wrap: balance;
@@ -1425,9 +1492,12 @@ img {
     font-size: 28px;
   }
 
-  .post-header h1,
-  .pd-header h1 {
+  .post-header h1 {
     font-size: 28px;
+  }
+
+  .pd-header {
+    --pd-title: 28px;
   }
 
   .post-item {
@@ -1488,7 +1558,7 @@ img {
   }
 }
 
-/* ---------- 인쇄 (Resume) ---------- */
+/* ---------- 인쇄 ---------- */
 @media print {
   :root,
   :root[data-theme="dark"] {

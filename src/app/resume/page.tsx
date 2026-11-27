@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactElement } from "react";
-import { DownloadIcon } from "@/components/Icons";
+import PrintButton from "@/components/PrintButton";
 import { resume, type Bullet } from "@/data/resume";
 import { renderInlineMarkdown } from "@/lib/markdown";
 import { getCase } from "@/lib/portfolio";
@@ -61,6 +61,18 @@ function Works({ works }: { works: RenderedWork[] }) {
   ));
 }
 
+// Experience·Projects 제목. 오른쪽에 자세한 내용은 Portfolio를 보라는 안내를 둔다.
+function PortfolioSectionHead({ title }: { title: string }) {
+  return (
+    <div className="titled-section-head">
+      <h2>{title}</h2>
+      <p className="title-meta">
+        자세한 내용은 <Link href="/portfolio/">포트폴리오</Link>를 참고해 주세요.
+      </p>
+    </div>
+  );
+}
+
 // 학교, 교육과정, 자격증: 이름은 왼쪽, 기간은 오른쪽, 필요하면 아래에 한 줄 더.
 function Entries({ entries }: { entries: Entry[] }) {
   return (
@@ -107,10 +119,7 @@ export default async function ResumePage() {
         <p className="resume-role">{resume.role}</p>
         <div className="title-row">
           <h1 className="page-title">{resume.name}</h1>
-          <a href={resume.pdf} download className="pdf-button no-print">
-            <DownloadIcon />
-            PDF
-          </a>
+          <PrintButton />
         </div>
         <div className="resume-contact">
           <a href={`mailto:${site.email}`}>{site.email}</a>
@@ -144,12 +153,7 @@ export default async function ResumePage() {
       </section>
 
       <section className="titled-section">
-        <div className="titled-section-head">
-          <h2>Experience</h2>
-          <p className="title-meta">
-            자세한 내용은 <Link href="/portfolio/">포트폴리오</Link>를 참고해 주세요.
-          </p>
-        </div>
+        <PortfolioSectionHead title="Experience" />
         {experience.map((job) => (
           <div key={`${job.company} ${job.role}`} className="resume-item">
             <div className="item-head">
@@ -173,7 +177,7 @@ export default async function ResumePage() {
       </section>
 
       <section className="titled-section">
-        <h2>Projects</h2>
+        <PortfolioSectionHead title="Projects" />
         {projects.map((project) => (
           <div key={project.title} className="resume-item resume-project">
             <div className="item-head">

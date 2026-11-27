@@ -51,11 +51,12 @@ export function LinkIcon({ size = 18, className }: IconProps) {
   );
 }
 
-export function DownloadIcon({ size = 16, className }: IconProps) {
+export function PrinterIcon({ size = 16, className }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" {...stroke} className={className} aria-hidden="true">
-      <path d="M12 3v12M7 10l5 5 5-5" />
-      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+      <path d="M6 9V2h12v7" />
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+      <rect x="6" y="14" width="12" height="8" />
     </svg>
   );
 }

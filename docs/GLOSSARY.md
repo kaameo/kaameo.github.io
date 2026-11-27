@@ -49,5 +49,5 @@ _Avoid_: CV, 이력 (Resume 문서를 가리킬 때)
 _Avoid_: Troubleshooting (설계 작업까지 가리킬 때), 이슈, 장애 사례
 
 **Portfolio**:
-Project마다 개요와 Case를 모아 보여 주는 페이지. Company에서 한 Project(Experience)와 그 밖의 Project(Projects)로 나누고, Case 하나가 상세 페이지 하나다. Project 전체 구조나 회고도 Case처럼 상세 페이지 하나로 둔다. 제출용 경력기술서와 포트폴리오 문서의 내용을 한곳에 합친 것이다.
+Project마다 개요와 Case를 모아 보여 주는 페이지. Project를 차례로 나열하고, Case 하나가 상세 페이지 하나다. Project 전체 구조나 회고도 Case처럼 상세 페이지 하나로 둔다. 제출용 경력기술서와 포트폴리오 문서의 내용을 한곳에 합친 것이다.
 _Avoid_: 경력기술서 (사이트의 Portfolio를 가리킬 때)

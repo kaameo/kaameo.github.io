@@ -20,7 +20,6 @@ type Resume = {
   name: string;
   role: string;
   linkedin: string;
-  pdf: string;
   summary: string[];
   experience: Employment[];
   projects: Project[];
@@ -33,9 +32,6 @@ export const resume: Resume = {
   name: "홍진수",
   role: "Backend Engineer",
   linkedin: "https://www.linkedin.com/in/jinsu-hong",
-  // 이력서 저장소의 resume.html을 Chrome으로 출력한 파일. 웹용이라 사진은 빼고, EXPERIENCE 안내는 웹 Resume처럼
-  // "자세한 내용은 포트폴리오를 참고해 주세요."(사이트 /portfolio/ 링크)로 바꾸고, PROJECTS 안내는 뺐다.
-  pdf: "/hong-jinsu_resume.pdf",
 
   summary: [
     "**Node.js 백엔드와 Go 데이터 수집 플랫폼**을 설계, 구현하고 AWS EKS에서 운영",

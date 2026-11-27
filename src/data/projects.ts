@@ -1,16 +1,11 @@
-// Portfolio에 보여 줄 Company 소개와 Project 개요. 배열 순서가 화면 순서다.
-// 이력서 저장소의 work_experience.md(Company와 그 Project)와 portfolio.md(그 밖의 Project)를 옮겼다.
+// Portfolio에 보여 줄 Project 개요. 배열 순서가 요약 페이지와 사이드바의 순서다.
+// 이력서 저장소의 work_experience.md와 portfolio.md를 옮겼다.
 // content/portfolio/*.mdx Case의 project 값이 여기 slug와 같아야 한다.
 
 type Link = { label: string; href: string };
 
-// Experience 섹션 맨 위에 두는 Company 소개. items는 한 줄 마크다운(**굵게** 등)이다.
-export type Company = { name: string; role: string; period: string; items: string[] };
-
 export type Project = {
   slug: string;
-  // experience: Company에서 한 Project, project: 교육과정·개인 작업 등 그 밖의 Project
-  section: "experience" | "project";
   title: string;
   subtitle: string;
   period: string;
@@ -22,29 +17,9 @@ export type Project = {
   links: Link[];
 };
 
-// Portfolio 제목 옆 다운로드 버튼. 이력서 저장소의 work_experience.html, portfolio.html을 Chrome으로 출력한 PDF를 고치지 않고 그대로 둔다.
-export const pdfs: Link[] = [
-  { label: "경력기술서 PDF", href: "/hong-jinsu_work-experience.pdf" },
-  { label: "포트폴리오 PDF", href: "/hong-jinsu_portfolio.pdf" },
-];
-
-export const companies: Company[] = [
-  {
-    name: "㈜인브릿지",
-    role: "개발팀 인턴 → 연구원 (Backend Engineer)",
-    period: "2025. 03 - 2026. 07 (1년 5개월, 인턴 6개월 포함)",
-    items: [
-      "(인턴) Microsoft Teams 통화/미팅 녹취 및 LLM 요약 제공 서비스, Node.js 백엔드와 React 프론트엔드 개발",
-      "2025. 06부터 Sentivex 프로젝트의 수집 플랫폼, 서비스 백엔드, 운영 인프라 담당",
-      "2025. 09 **연구원으로 전환**해 계속 근무",
-    ],
-  },
-];
-
 export const projects: Project[] = [
   {
     slug: "sentivex",
-    section: "experience",
     title: "Sentivex",
     subtitle: "㈜인브릿지",
     period: "2025. 06 - 2026. 07",
@@ -61,7 +36,6 @@ export const projects: Project[] = [
   },
   {
     slug: "hapbang",
-    section: "project",
     title: "합방",
     subtitle: "K-Digital Training 5인 팀 프로젝트, 우수상",
     period: "2026. 10 - 2026. 11",
@@ -76,7 +50,6 @@ export const projects: Project[] = [
   },
   {
     slug: "sidecar",
-    section: "project",
     title: "Sidecar",
     subtitle: "개인 오픈소스 프로젝트",
     period: "2026. 10 - now",

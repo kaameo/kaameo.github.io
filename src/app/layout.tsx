@@ -31,10 +31,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <Header />
-        <main className="page">
-          <div className="container">{children}</div>
-        </main>
-        <Footer />
+        <div className="frame">
+          <main className="page">
+            <div className="container">{children}</div>
+          </main>
+          <Footer />
+        </div>
       </body>
       {site.gaId && <GoogleAnalytics gaId={site.gaId} />}
     </html>
