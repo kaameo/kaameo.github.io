@@ -26,12 +26,6 @@ function processor() {
 
 const toReact = { Fragment: runtime.Fragment, jsx: runtime.jsx, jsxs: runtime.jsxs };
 
-// 여러 문단짜리 마크다운(빈 줄로 문단 구분)을 React 요소로 바꾼다.
-export async function renderMarkdown(markdown: string): Promise<ReactElement> {
-  const file = await processor().use(rehypeReact, toReact).process(markdown);
-  return file.result as ReactElement;
-}
-
 // 한 줄짜리 마크다운(**굵게**, [링크](url), `코드`)을 감싸는 태그 없이 React 요소로 바꾼다.
 export async function renderInlineMarkdown(markdown: string): Promise<ReactElement> {
   const file = await processor().use(rehypeUnwrapParagraph).use(rehypeReact, toReact).process(markdown);

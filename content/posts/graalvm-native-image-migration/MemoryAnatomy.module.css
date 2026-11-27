@@ -1,0 +1,8 @@
+.svg {
+  font-family: var(--font-body);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

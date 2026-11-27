@@ -1,0 +1,78 @@
+/* 운영 지표 변화(기동 시간·이미지 크기·노드 배치 여유) 비교 막대(OpsImpact.tsx). */
+
+.groups {
+  display: grid;
+  gap: 20px;
+}
+
+.groupHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 8px;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--chart-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr) 156px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.row + .row {
+  margin-top: 6px;
+}
+
+.period {
+  color: var(--muted);
+}
+
+.track {
+  display: block;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--soft);
+  overflow: hidden;
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  min-width: 4px;
+  border-radius: 3px;
+}
+
+.value {
+  text-align: right;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.value strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: 8px;
+    font-size: 12.5px;
+  }
+}

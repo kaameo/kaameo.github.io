@@ -81,6 +81,7 @@ import { latency } from "./data";
 | 블로그 이름, 소개, GitHub 주소, 이메일 | `src/lib/site.ts` |
 | Resume | `src/data/resume.ts` |
 | Resume PDF | `public/hong-jinsu_resume.pdf` (이력서 저장소의 `resume.html`을 Chrome으로 출력. 사진과 PROJECTS 안내는 빼고, EXPERIENCE 안내는 "자세한 내용은 포트폴리오를 참고해 주세요."로 바꿔 `https://kaameo.github.io/portfolio/`에 연결한다) |
+| Portfolio PDF | `public/hong-jinsu_work-experience.pdf`, `public/hong-jinsu_portfolio.pdf` (이력서 저장소의 `work_experience.html`, `portfolio.html`을 Chrome으로 출력한 그대로 둔다. 버튼 목록은 `src/data/projects.ts`의 `pdfs`) |
 | Portfolio 프로젝트 개요와 순서 | `src/data/projects.ts` |
 | Portfolio 사례(Case) | `content/portfolio/*.mdx` |
 | 사례 본문 이미지 | `public/portfolio/` |
@@ -96,7 +97,7 @@ order: 2         # 같은 프로젝트 안에서의 순서
 ---
 ```
 
-본문은 `## 문제 상황`, `## 접근 방식`, `## 해결 및 성과`, `## 참고` 순서로 씁니다. 이미지는 `![설명](/portfolio/파일.png)`로 넣고, 한 문단에 두 장을 붙여 쓰면 나란히 놓입니다.
+본문은 `## 문제 상황`, `## 접근 방식`, `## 해결 및 성과`, `## 참고` 순서로 씁니다. 프로젝트 전체 구조나 회고처럼 이 순서를 따르지 않는 기록도 사례 파일로 둘 수 있습니다. 상세 페이지 설명은 본문의 첫 문단이나 첫 목록에서 가져옵니다. 이미지는 `![설명](/portfolio/파일.png)`로 넣고, 한 문단에 두 장을 붙여 쓰면 나란히 놓입니다.
 
 Resume 불릿을 `{ text: "...", case: "사례 파일 이름" }`으로 쓰면 끝에 그 사례로 가는 "자세히 →" 링크가 붙습니다. `project`나 `case`가 없는 값을 가리키면 빌드가 실패합니다.
 

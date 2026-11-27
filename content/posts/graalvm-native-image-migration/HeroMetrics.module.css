@@ -1,0 +1,50 @@
+/* 글 첫머리의 핵심 수치 카드 4개(HeroMetrics.tsx). 얻은 효과 3개와 트레이드오프 1개를 나란히 놓는다. */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin: 28px 0 36px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 15px 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.value {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+}
+
+.delta {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--chart-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.cost .delta {
+  color: var(--chart-2);
+}
+
+.note {
+  margin-top: auto;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}

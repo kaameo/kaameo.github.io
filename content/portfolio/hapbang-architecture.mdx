@@ -1,0 +1,23 @@
+---
+title: "합방 전체 구조와 서비스 간 통신"
+project: hapbang
+order: 1
+---
+
+![합방 강의 목록 화면](/portfolio/hapbang-lectures.png)
+
+<small>합방 강의 목록 화면</small>
+
+## 전체 구조
+
+![합방 전체 구조](/portfolio/hapbang-architecture.png)
+
+- **MSA:** 독립된 앱 7개로 나누고, 공통 모듈에는 DTO, 이벤트, 오류 코드 같은 계약만 두도록 ArchUnit 테스트로 강제했습니다. 앱끼리는 내부 HTTP나 이벤트로만 연동합니다.
+- **데이터:** PostgreSQL 인스턴스 하나에 앱마다 DB와 계정을 따로 두고, 다른 앱의 DB에는 접속할 수 없게 했습니다.
+
+## 서비스 간 통신
+
+![서비스 간 통신](/portfolio/hapbang-communication.png)
+
+- **Outbox:** outbox 테이블과 relay를 직접 만드는 대신 Spring Modulith의 발행 기록을 outbox로 사용했습니다.
+- **HTTP/이벤트 선택 기준:** 앱 간 연동은 이벤트를 기본으로 하고, 응답을 바로 받아야 하는 호출만 내부 HTTP로 두었습니다.
