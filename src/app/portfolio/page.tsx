@@ -1,12 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArrowLink from "@/components/ArrowLink";
+import CaseHighlights from "@/components/CaseHighlights";
 import type { Project } from "@/data/projects";
-import { getProjectsWithCases, type Case } from "@/lib/portfolio";
+import { getProjectsWithCases, groupCases, type Case } from "@/lib/portfolio";
+import { site } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Portfolio" };
+// 인쇄 창에서 "PDF로 저장"하면 페이지 제목이 파일 이름이 되므로 사이트 이름을 붙이지 않는다.
+export const metadata: Metadata = { title: { absolute: `${site.author} 포트폴리오` } };
 
-// Project 하나: 개요 표 아래에 Case 제목을 불릿으로 두고, 각각 상세 페이지로 연결한다.
+// Case 하나: 제목과 태그는 왼쪽, "자세히 →"는 오른쪽 끝, 아래에 핵심 성과 한두 줄.
+function CaseItem({ item }: { item: Case }) {
+  return (
+    <li>
+      <Link href={`/portfolio/${item.slug}/`}>
+        <span>
+          {item.title}
+          {item.tags.length > 0 && <span className="pf-case-tags">{item.tags.join(" · ")}</span>}
+        </span>
+        <span aria-hidden="true" className="pf-case-more">
+          자세히 →
+        </span>
+      </Link>
+      <CaseHighlights items={item.highlights} className="pf-highlights" />
+    </li>
+  );
+}
+
+// Project 하나: 개요 표 아래에 Case 목록을 두고, 각각 상세 페이지로 연결한다.
+// 전체 구조·회고처럼 group이 있는 Case는 주요 사례 아래에 작은 제목으로 따로 묶는다.
 function ProjectCard({ project, cases }: { project: Project; cases: Case[] }) {
   return (
     <article id={project.slug} className="pf-project">
@@ -63,20 +85,16 @@ function ProjectCard({ project, cases }: { project: Project; cases: Case[] }) {
         )}
       </dl>
 
-      {cases.length > 0 && (
-        <ul className="pf-cases">
-          {cases.map((c) => (
-            <li key={c.slug}>
-              <Link href={`/portfolio/${c.slug}/`}>
-                {c.title}
-                <span aria-hidden="true" className="arrow">
-                  자세히 →
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      {groupCases(cases).map((group) => (
+        <div key={group.label ?? ""} className="pf-case-group">
+          {group.label && <p className="pf-group-label">{group.label}</p>}
+          <ul className="pf-cases">
+            {group.cases.map((c) => (
+              <CaseItem key={c.slug} item={c} />
+            ))}
+          </ul>
+        </div>
+      ))}
     </article>
   );
 }

@@ -864,10 +864,14 @@ img {
   border-bottom: 1px solid var(--line);
 }
 
-/* 연락처 한 줄: 굵은 라벨, 주소, //. 위 간격은 헤더 gap(8px)과 더해 resume.html의 18px. */
+/* 연락처 두 줄: 굵은 라벨, 주소, //. 위 간격은 헤더 gap(8px)과 더해 resume.html의 18px. */
 .resume-contact {
-  margin: 10px 0 0;
+  margin-top: 10px;
   font-size: 15px;
+}
+
+.resume-contact p {
+  margin: 0;
 }
 
 .contact-item {
@@ -1061,13 +1065,20 @@ img {
   font-size: 15px;
 }
 
-/* 불릿 기호는 resume.html처럼 작은 회색 •, 들여쓰기는 글자 크기를 따라간다. */
-.resume-bullets li {
+/* 불릿 기호는 resume.html처럼 작은 회색 •, 들여쓰기는 글자 크기를 따라간다.
+   Resume 불릿과 Portfolio의 역할 목록, Case 핵심 성과가 같은 모양을 쓴다. */
+.resume-bullets li,
+.pf-role li,
+.pf-highlights li,
+.pd-highlights li {
   position: relative;
   padding-left: 0.85em;
 }
 
-.resume-bullets li::before {
+.resume-bullets li::before,
+.pf-role li::before,
+.pf-highlights li::before,
+.pd-highlights li::before {
   content: "•";
   position: absolute;
   left: 0;
@@ -1196,6 +1207,16 @@ img {
   line-height: 1.5;
 }
 
+/* 주요 사례 아래 따로 묶은 Case의 작은 제목(예: 기타). 왼쪽 세로줄은 Case 줄과 이어진다. */
+.pf-nav .pf-nav-group {
+  padding: 9px 0 3px 12px;
+  border-left: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
 .pf-nav .pf-nav-case[aria-current="page"] {
   padding-left: 11px;
   border-left: 2px solid var(--accent);
@@ -1236,23 +1257,54 @@ img {
 
 .pf-role {
   margin: 0;
-  padding-left: 18px;
+  padding: 0;
+  list-style: none;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
+/* Case 목록. 묶음(주요 사례, 기타 등)마다 하나이고, group이 있는 묶음은 위에 작은 제목을 둔다. */
+.pf-case-group {
+  margin-top: 20px;
+}
+
+.pf-group-label {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
 .pf-cases {
-  margin: 18px 0 0;
-  padding-left: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 14px;
   font-size: 15px;
 }
 
-.pf-cases li::marker {
+/* Case 제목 옆의 기술·주제 태그 */
+.pf-case-tags {
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 400;
   color: var(--muted);
+}
+
+/* Case의 핵심 성과 한두 줄: 요약 페이지 Case 제목 아래(.pf-highlights)와 상세 페이지 제목 아래(.pd-highlights) */
+.pf-highlights,
+.pd-highlights {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pd-highlights {
+  font-size: 17px;
 }
 
 /* Case 제목은 왼쪽, "자세히 →"는 오른쪽 끝. 제목이 길어 접히면 "자세히 →"는 첫 줄 높이에 있다. */
@@ -1269,7 +1321,7 @@ img {
   color: var(--accent);
 }
 
-.pf-cases .arrow {
+.pf-case-more {
   display: inline-block;
   flex: none;
   color: var(--accent);
@@ -1278,7 +1330,7 @@ img {
   transition: transform 0.15s ease;
 }
 
-.pf-cases a:hover .arrow {
+.pf-cases a:hover .pf-case-more {
   transform: translateX(3px);
 }
 
@@ -1291,10 +1343,10 @@ img {
   border-bottom: 1px solid var(--line);
 }
 
+/* 어느 Project의 Case인지와 기간. Resume·Portfolio의 기간처럼 본문 글꼴에 회색. */
 .pd-kicker {
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
 }
 
@@ -1562,7 +1614,7 @@ img {
   }
 
   /* 좁은 화면에서는 연락처를 한 항목씩 줄을 바꾸고 //를 뺀다. */
-  .resume-contact {
+  .resume-contact p {
     display: flex;
     flex-direction: column;
   }

@@ -12,6 +12,12 @@ export type Case = {
   title: string;
   project: Project;
   order: number;
+  // 기술·주제 태그. 요약 페이지에서 Case 제목 옆에 둔다.
+  tags: string[];
+  // 핵심 성과 한두 줄(한 줄 마크다운). 요약 페이지 Case 제목 아래와 상세 페이지 제목 아래에 둔다.
+  highlights: string[];
+  // 문제 상황 → 접근 방식 → 해결 및 성과 순서가 아닌 기록(전체 구조, 회고)을 따로 묶는 작은 제목. 없으면 주요 사례다.
+  group?: string;
   // 상세 페이지 설명과 llms.txt에 쓰는 첫 문단이나 첫 목록(보통 문제 상황)
   summary: string;
 };
@@ -31,6 +37,8 @@ function firstParagraph(markdown: string): string {
     .replace(/\s+/g, " ");
 }
 
+const strings = (value: unknown): string[] => (Array.isArray(value) ? value.map(String) : []);
+
 function readCase(file: string): Case {
   const raw = fs.readFileSync(path.join(PORTFOLIO_DIR, file), "utf8");
   const { data, content } = matter(raw);
@@ -42,6 +50,9 @@ function readCase(file: string): Case {
     title: String(data.title ?? ""),
     project,
     order: Number(data.order ?? 0),
+    tags: strings(data.tags),
+    highlights: strings(data.highlights),
+    group: data.group ? String(data.group) : undefined,
     summary: firstParagraph(content),
   };
 }
@@ -60,7 +71,22 @@ export function getCase(slug: string): Case | undefined {
   return getAllCases().find((c) => c.slug === slug);
 }
 
-// Project마다 그 Case 목록. Portfolio 요약과 사이드바가 같은 묶음과 순서를 쓴다.
+// Case 묶음. label이 없으면 주요 사례, 있으면 그 아래 작은 제목(예: 기타)으로 따로 묶인 Case들이다.
+export type CaseGroup<T> = { label?: string; cases: T[] };
+
+// Case를 묶음으로 나눈다. 주요 사례(group 없음)가 먼저, 그다음 group이 처음 나온 순서대로. 묶음 안에서는 원래 순서.
+// Portfolio 요약과 사이드바가 같은 묶음을 쓴다.
+export function groupCases<T extends { group?: string }>(cases: T[]): CaseGroup<T>[] {
+  const groups: CaseGroup<T>[] = [];
+  for (const item of [...cases.filter((c) => !c.group), ...cases.filter((c) => c.group)]) {
+    const group = groups.find((g) => g.label === item.group);
+    if (group) group.cases.push(item);
+    else groups.push({ label: item.group, cases: [item] });
+  }
+  return groups;
+}
+
+// Project마다 그 Case 목록. Portfolio 요약과 사이드바가 같은 순서를 쓴다.
 export function getProjectsWithCases(): { project: Project; cases: Case[] }[] {
   const cases = getAllCases();
   return projects.map((project) => ({ project, cases: cases.filter((c) => c.project === project) }));

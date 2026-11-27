@@ -92,8 +92,14 @@ import { latency } from "./data";
 title: "GraalVM Native Image로 고객센터 앱 메모리 할당량 43% 절감"
 project: hapbang # src/data/projects.ts의 slug
 order: 2         # 같은 프로젝트 안에서의 순서
+tags: ["GraalVM Native Image", "k3s", "EC2"] # Portfolio 요약에서 제목 옆에 보이는 태그
+highlights:      # 핵심 성과 한두 줄(한 줄 마크다운). Portfolio 요약 제목 아래와 상세 페이지 제목 아래에 보인다
+  - "고객센터 앱을 GraalVM Native Image로 전환해 **메모리 할당량 43% 절감**"
+group: "기타"    # 문제 상황 → 해결 순서가 아닌 기록(전체 구조, 회고)만. 요약과 사이드바에서 주요 사례 아래 따로 묶인다
 ---
 ```
+
+`tags`, `highlights`, `group`은 없어도 됩니다.
 
 본문은 `## 문제 상황`, `## 접근 방식`, `## 해결 및 성과`, `## 참고` 순서로 씁니다. 프로젝트 전체 구조나 회고처럼 이 순서를 따르지 않는 기록도 사례 파일로 둘 수 있습니다. 상세 페이지 설명은 본문의 첫 문단이나 첫 목록에서 가져옵니다. 이미지는 `![설명](/portfolio/파일.png)`로 넣고, 한 문단에 두 장을 붙여 쓰면 나란히 놓입니다.
 

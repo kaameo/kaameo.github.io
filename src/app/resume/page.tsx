@@ -7,7 +7,8 @@ import { resume, type Work } from "@/data/resume";
 import { renderInlineMarkdown } from "@/lib/markdown";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Resume" };
+// 인쇄 창에서 "PDF로 저장"하면 페이지 제목이 파일 이름이 되므로 사이트 이름을 붙이지 않는다.
+export const metadata: Metadata = { title: { absolute: `${resume.name} 이력서` } };
 
 type Entry = (typeof resume.education)[number];
 type RenderedWork = Omit<Work, "items"> & { items: ReactElement[] };
@@ -43,32 +44,47 @@ function Works({ works }: { works: RenderedWork[] }) {
   ));
 }
 
-// 연락처: 한 줄에 "라벨: 주소"를 //로 나눈다(resume.html의 모양). 주소는 https://와 www.를 떼고 보여 준다.
+// 연락처: 두 줄(Email // Blog, GitHub // LinkedIn)에 "라벨: 주소"를 //로 나눈다(resume.html의 모양).
+// 주소는 https://와 www.를 떼고 보여 준다. Email은 링크 없이 글자만 둔다.
+type ContactItem = { label: string; text: string; href?: string };
 const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "");
-const contacts = [
-  { label: "Email", href: `mailto:${site.email}`, text: site.email },
-  { label: "GitHub", href: site.github, text: bare(site.github) },
-  { label: "Blog", href: "/", text: bare(site.url) },
-  { label: "LinkedIn", href: resume.linkedin, text: bare(resume.linkedin) },
+const contactLines: ContactItem[][] = [
+  [
+    { label: "Email", text: site.email },
+    { label: "Blog", href: "/", text: bare(site.url) },
+  ],
+  [
+    { label: "GitHub", href: site.github, text: bare(site.github) },
+    { label: "LinkedIn", href: resume.linkedin, text: bare(resume.linkedin) },
+  ],
 ];
+
+function ContactValue({ item }: { item: ContactItem }) {
+  if (!item.href) return item.text;
+  return item.href.startsWith("/") ? <Link href={item.href}>{item.text}</Link> : <a href={item.href}>{item.text}</a>;
+}
 
 function Contact() {
   return (
-    <p className="resume-contact">
-      {contacts.map((item, i) => (
-        <Fragment key={item.label}>
-          {i > 0 && (
-            <span className="contact-sep" aria-hidden="true">
-              //
-            </span>
-          )}
-          <span className="contact-item">
-            <b>{item.label}:</b>{" "}
-            {item.href.startsWith("/") ? <Link href={item.href}>{item.text}</Link> : <a href={item.href}>{item.text}</a>}
-          </span>
-        </Fragment>
+    <div className="resume-contact">
+      {contactLines.map((line) => (
+        <p key={line[0].label}>
+          {line.map((item, i) => (
+            <Fragment key={item.label}>
+              {i > 0 && (
+                <span className="contact-sep" aria-hidden="true">
+                  //
+                </span>
+              )}
+              <span className="contact-item">
+                <b>{item.label}:</b>{" "}
+                <ContactValue item={item} />
+              </span>
+            </Fragment>
+          ))}
+        </p>
       ))}
-    </p>
+    </div>
   );
 }
 
