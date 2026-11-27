@@ -113,7 +113,7 @@ export const resume: Resume = {
   ],
 
   skills: [
-    { group: "Backend", items: ["TypeScript (NestJS)", "Java (Spring Boot)", "Go"] },
+    { group: "Backend", items: ["Java (Spring Boot)", "TypeScript (NestJS)", "Go"] },
     { group: "Data & Messaging", items: ["PostgreSQL", "Redis", "Apache Kafka"] },
     { group: "Infra & DevOps", items: ["AWS", "Kubernetes", "Docker", "GitHub Actions"] },
     { group: "Observability", items: ["Prometheus", "Grafana"] },
