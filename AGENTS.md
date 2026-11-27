@@ -33,4 +33,6 @@ Single-context: `docs/GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.
 ## 확인 방법
 
 - `pnpm typecheck && pnpm build`로 확인한다. 렌더링을 건드리는 리팩터링은 변경 전후 `out/`의 HTML을 `<script>`와 `<link>`를 빼고 비교한다.
+- 라우트를 옮긴 뒤 `pnpm typecheck`가 `.next/types` 때문에 실패하면 `pnpm build`를 먼저 돌린다.
 - 같은 폴더에 `next dev`가 이미 떠 있으면, 포트를 바꿔도 두 번째 `pnpm dev`는 뜨지 않는다. 떠 있는 서버(:3000)를 쓴다.
+- 화면·인쇄 확인은 `out/`으로 한다. :3000 dev 서버는 예전 결과를 보여 줄 때가 있다. `out/`을 스크래치 폴더로 복사해 `/_next/`·`/portfolio/` 절대 경로를 상대 경로로 바꾸고, headless Chrome의 `--screenshot`·`--print-to-pdf`로 연다.
