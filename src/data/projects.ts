@@ -11,8 +11,8 @@ export type Project = {
   period: string;
   overview: string;
   team?: string;
-  // 여러 줄이면 목록으로 보인다.
-  role: string | string[];
+  // 여러 줄이면 목록으로 보인다. 없으면 역할 줄을 두지 않는다(Sidecar).
+  role?: string | string[];
   tech: string;
   links: Link[];
 };
@@ -31,7 +31,7 @@ export const projects: Project[] = [
       "AI 보고서: 보안 담당자가 직접 작성하던 보안 사건 보고서를 LLM API로 생성하는 기능 설계, 구현",
       "인프라: AWS EKS 운영 클러스터 비용 최적화, GitHub Actions CI/CD와 Prometheus/Grafana 모니터링 구축",
     ],
-    tech: "Go, NestJS, PostgreSQL, Prisma, Redis, Kafka, AWS EKS, GitHub Actions, Prometheus, Grafana",
+    tech: "Go, NestJS, PostgreSQL, Redis, Kafka, AWS EKS, GitHub Actions, Prometheus, Grafana",
     links: [],
   },
   {
@@ -55,7 +55,6 @@ export const projects: Project[] = [
     period: "2026. 10 - now",
     overview:
       "Claude Code 패널에서 AI 에이전트의 질문을 버튼으로 답하고, 세션 요약을 보여 주는 플러그인(Mods), 병렬 세션 개발 흐름의 불편을 해결하기 위해 개발, 합방 프로젝트 팀원 3명에게 공유",
-    role: "플러그인 단독 설계, 개발",
     tech: "TypeScript, Claude Code Mods",
     links: [{ label: "GitHub", href: "https://github.com/kaameo-lab/sidecar" }],
   },

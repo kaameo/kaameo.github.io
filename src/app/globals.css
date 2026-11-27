@@ -87,10 +87,6 @@ img {
   border-radius: 2px;
 }
 
-.mono {
-  font-family: var(--font-mono);
-}
-
 .container {
   max-width: calc(var(--max) + 2 * var(--gutter));
   margin-inline: auto;
@@ -153,11 +149,33 @@ img {
   border-bottom-color: var(--fg);
 }
 
-.header-actions {
-  display: flex;
-  gap: 8px;
+/* ---------- Layout ---------- */
+/* main. Portfolio 사이드바가 이 상자를 기준으로 헤더 아래부터 페이지 끝까지 세로선을 긋는다.
+   아래 여백은 오른쪽 아래 도구 막대(.site-dock)보다 넉넉해서, 끝까지 내리면 마지막 내용이 막대에 가리지 않는다. */
+.page {
+  position: relative;
+  padding-block: var(--page-top) 128px;
 }
 
+/* ---------- 도구 막대 (SiteDock) ---------- */
+/* 화면 오른쪽 아래에 떠 있는 테두리 없는 아이콘 버튼 묶음(인쇄·GitHub·다크 모드).
+   막대 오른쪽 끝은 헤더 메뉴(Book) 오른쪽 끝과 같은 세로줄이다. 헤더 내용(--max + 2 × --aside = 1440)이 화면 가운데에 있으므로
+   넓은 화면에서는 (화면 폭 - 1440) / 2, 좁으면 헤더 여백(--gutter). %는 스크롤바를 뺀 화면 폭이라 헤더와 기준이 같다. */
+.site-dock {
+  position: fixed;
+  right: max(var(--gutter), calc((100% - var(--max) - 2 * var(--aside)) / 2));
+  bottom: var(--gutter);
+  z-index: 40;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
+}
+
+/* 도구 막대의 테두리 없는 아이콘 버튼(PrintButton, GitHub, ThemeToggle) */
 .icon-btn {
   width: 36px;
   height: 36px;
@@ -165,7 +183,7 @@ img {
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid var(--line);
+  border: 0;
   border-radius: 8px;
   background: none;
   color: var(--fg);
@@ -194,22 +212,6 @@ img {
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
-}
-
-/* ---------- Layout ---------- */
-/* main과 푸터를 감싸는 상자(layout.tsx). Portfolio 사이드바가 이 상자를 기준으로 헤더 아래부터 페이지 끝까지 세로선을 긋는다. */
-.frame {
-  position: relative;
-}
-
-.page {
-  padding-block: var(--page-top) 48px;
-}
-
-.site-footer .container {
-  padding-bottom: 64px;
-  font-size: 13px;
-  color: var(--muted);
 }
 
 .page-title {
@@ -243,9 +245,9 @@ img {
   color: var(--fg);
 }
 
+/* Resume·Portfolio의 기간. resume.html처럼 본문 글꼴에 회색. */
 .period {
-  font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
 }
 
@@ -850,51 +852,90 @@ img {
 
 .resume-role {
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.12em;
+  font-size: 14px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-/* Resume·Portfolio 제목 오른쪽 끝에 인쇄 버튼(아이콘)을 둔다. 폭이 좁으면 버튼이 아래 줄로 내려간다. */
-.title-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px 16px;
+/* 이름 아래 가로줄(resume.html의 name-rule) */
+.resume-header .page-title {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
 }
 
+/* 연락처 한 줄: 굵은 라벨, 주소, //. 위 간격은 헤더 gap(8px)과 더해 resume.html의 18px. */
 .resume-contact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 20px;
-  margin-top: 4px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--muted);
+  margin: 10px 0 0;
+  font-size: 15px;
 }
 
-.resume-contact a,
+.contact-item {
+  white-space: nowrap;
+}
+
+.contact-sep {
+  margin: 0 9px;
+  font-weight: 700;
+}
+
+.resume-contact a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .resume-bullets a,
 .item-links a {
   color: var(--accent);
 }
 
-/* 섹션 제목을 내용 위에 두고, 제목 아래 가로줄로 섹션을 나눈다. */
+/* Resume 안의 링크(Summary 문장, 포트폴리오 안내)와 Resume·Portfolio의 프로젝트 서비스·GitHub 링크는
+   resume.html처럼 밑줄을 긋고 끝에 화살표(ArrowLink, .link-arrow)를 둔다. */
+.resume-bullets a,
+.item-links a,
+.title-meta a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+/* 링크 끝 화살표(Icons.tsx ArrowIcon): resume.html의 .arrow(9~10pt 글자에 7px)와 같은 비율. */
+.link-arrow {
+  width: 0.55em;
+  height: 0.55em;
+  margin-left: 0.15em;
+  vertical-align: 0.08em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+
+/* `코드` 표기: resume.html처럼 본문 글꼴에 회색 바탕과 테두리로 구별한다. */
+.resume code {
+  padding: 0 4px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--code);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* 섹션 제목을 내용 위에 두고, 제목 아래 가로줄로 섹션을 나눈다.
+   Resume 간격(섹션, 업무, 불릿, 프로젝트 사이)은 resume.html과 같은 px 값이다. 인쇄는 이 화면을 그대로 줄여 A4 두 장에 넣는다. */
 .titled-section {
-  padding-top: 48px;
+  padding-top: 34px;
 }
 
 .titled-section h2 {
-  margin: 0 0 24px;
-  padding-bottom: 12px;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--line);
   font-size: 22px;
   font-weight: 700;
   line-height: 1.35;
-  letter-spacing: -0.015em;
+  /* resume.html처럼 대문자에 자간을 넓힌다. */
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 /* 제목 오른쪽에 회색 안내("자세한 내용은 포트폴리오를…")를 둘 때는 둘을 한 줄로 묶고, 가로줄과 간격은 줄이 맡는다.
@@ -905,8 +946,8 @@ img {
   justify-content: space-between;
   align-items: baseline;
   gap: 4px 16px;
-  margin-bottom: 24px;
-  padding-bottom: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -923,14 +964,13 @@ img {
 }
 
 .title-meta a {
-  font-weight: 600;
   color: var(--accent);
 }
 
 /* 직책, 프로젝트 사이는 가는 선으로 나눈다. */
 .resume-item + .resume-item {
-  margin-top: 28px;
-  padding-top: 28px;
+  margin-top: 18px;
+  padding-top: 18px;
   border-top: 1px solid var(--line);
 }
 
@@ -972,12 +1012,12 @@ img {
 }
 
 .product {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 /* 한 직책 아래 제품이 여러 개면(Sentivex, Teams Add-in) 제품 사이를 띄운다. */
 .product + .product {
-  margin-top: 28px;
+  margin-top: 20px;
 }
 
 .product-head,
@@ -996,7 +1036,7 @@ img {
 }
 
 .work {
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .work-head h5 {
@@ -1010,41 +1050,44 @@ img {
   color: var(--muted);
 }
 
-/* 본문 글씨는 Summary, 불릿, 한 줄 설명, Education 아래 줄 모두 15px로 맞춘다 (resume.html은 모두 10pt). */
+/* 본문 글씨는 Summary, 불릿, 한 줄 설명, Skills, Education 아래 줄 모두 15px로 맞춘다. 인쇄(89%)에서 10pt가 되어 resume.html과 같다. */
 .resume-bullets {
-  margin: 6px 0 0;
-  padding-left: 18px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   font-size: 15px;
 }
 
-/* Case가 있는 불릿 끝에 붙는 Portfolio 상세 링크 */
-.case-link {
-  font-size: 13px;
-  color: var(--accent);
-  white-space: nowrap;
+/* 불릿 기호는 resume.html처럼 작은 회색 •, 들여쓰기는 글자 크기를 따라간다. */
+.resume-bullets li {
+  position: relative;
+  padding-left: 0.85em;
 }
 
-.case-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.resume-bullets li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--muted);
 }
 
 /* 제품·프로젝트 이름 아래 한 줄 설명 */
 .resume-intro {
-  margin: 10px 0 0;
+  margin: 6px 0 0;
   padding-left: 12px;
   border-left: 2px solid var(--line);
   font-size: 15px;
   color: var(--muted);
 }
 
+/* Skills: 분류는 왼쪽, 기술은 쉼표로 이은 글자 한 줄(resume.html과 같은 모양). */
 .skill-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px;
 }
 
 .skill-row {
@@ -1059,18 +1102,8 @@ img {
   font-weight: 600;
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.chip {
-  padding: 2px 10px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+.skill-items {
+  font-size: 15px;
 }
 
 .resume-entries {
@@ -1079,16 +1112,18 @@ img {
   gap: 16px;
 }
 
+/* 학과·졸업 같은 한 줄 설명은 resume.html처럼 굵게. */
 .resume-entry-detail {
   margin: 2px 0 0;
   font-size: 15px;
+  font-weight: 600;
 }
 
 /* ---------- Portfolio ---------- */
 /* Portfolio 사이드바: 요약과 Case 상세에 함께 붙는다(portfolio/layout.tsx).
    본문(--max)은 다른 페이지처럼 가운데에 두고, 사이드바 영역(--aside: 목록 + --aside-gap + 세로선 + --aside-gap)을 본문 바로 왼쪽에 붙인다.
    화면이 넓어지면 그 왼쪽이 비고, 좁으면 왼쪽 여백(--gutter)을 지키려고 목록이 줄어든다.
-   .frame(main + 푸터)을 기준으로 놓아서 세로선이 헤더 아래부터 페이지 끝까지 이어지고, 50%는 화면 가운데다. */
+   .page(main)를 기준으로 놓아서 세로선이 헤더 아래부터 페이지 끝까지 이어지고, 50%는 화면 가운데다. */
 .pf-sidebar {
   display: none;
   position: absolute;
@@ -1220,7 +1255,12 @@ img {
   color: var(--muted);
 }
 
+/* Case 제목은 왼쪽, "자세히 →"는 오른쪽 끝. 제목이 길어 접히면 "자세히 →"는 첫 줄 높이에 있다. */
 .pf-cases a {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
   font-weight: 600;
   transition: color 0.15s ease;
 }
@@ -1231,7 +1271,10 @@ img {
 
 .pf-cases .arrow {
   display: inline-block;
-  margin-left: 6px;
+  flex: none;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 400;
   transition: transform 0.15s ease;
 }
 
@@ -1239,13 +1282,7 @@ img {
   transform: translateX(3px);
 }
 
-.arrow {
-  flex: none;
-  color: var(--accent);
-}
-
 .pd-header {
-  --pd-title: 38px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1266,23 +1303,9 @@ img {
   color: var(--fg);
 }
 
-/* Case 제목 오른쪽 끝에 인쇄 버튼(아이콘). 제목이 여러 줄이면 버튼은 첫 줄 높이에 맞춘다. */
-.pd-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-/* 버튼(36px)을 제목 첫 줄(글자 크기 × 줄 높이 1.3) 가운데에 맞춘다. */
-.pd-title-row .icon-btn {
-  flex: none;
-  margin-top: calc((var(--pd-title) * 1.3 - 36px) / 2);
-}
-
 .pd-header h1 {
   margin: 0;
-  font-size: var(--pd-title);
+  font-size: 38px;
   line-height: 1.3;
   letter-spacing: -0.025em;
   text-wrap: balance;
@@ -1465,12 +1488,7 @@ img {
     padding-top: 10px;
   }
 
-  .header-actions {
-    margin-left: auto;
-  }
-
   .site-nav {
-    order: 3;
     width: 100%;
     margin-left: 0;
     gap: 20px;
@@ -1478,6 +1496,11 @@ img {
 
   .site-nav a {
     padding: 10px 0;
+  }
+
+  .site-dock .icon-btn {
+    width: 32px;
+    height: 32px;
   }
 
   .page {
@@ -1492,12 +1515,9 @@ img {
     font-size: 28px;
   }
 
-  .post-header h1 {
+  .post-header h1,
+  .pd-header h1 {
     font-size: 28px;
-  }
-
-  .pd-header {
-    --pd-title: 28px;
   }
 
   .post-item {
@@ -1532,9 +1552,23 @@ img {
     font-size: 18px;
   }
 
+  .skill-list {
+    gap: 10px;
+  }
+
   .skill-row {
     grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
+    gap: 0;
+  }
+
+  /* 좁은 화면에서는 연락처를 한 항목씩 줄을 바꾸고 //를 뺀다. */
+  .resume-contact {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .contact-sep {
+    display: none;
   }
 
   .pf-overview > div {
@@ -1602,5 +1636,16 @@ img {
   .item-head,
   .product-head {
     break-after: avoid;
+  }
+
+  /* Resume는 화면을 그대로 89%로 줄여 찍는다. 화면 본문 15px이 10pt(resume.html과 같은 크기)가 되고, A4 두 장에 들어간다.
+     크기·간격을 인쇄에서 따로 바꾸지 않아야 PDF가 화면과 같은 비율로 보인다. */
+  .resume {
+    zoom: 0.89;
+  }
+
+  /* resume.html처럼 두 번째 제품(Teams Add-in)부터 2쪽에서 시작한다. */
+  .resume .product + .product {
+    break-before: page;
   }
 }

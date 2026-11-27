@@ -79,7 +79,7 @@ import { latency } from "./data";
 | 바꿀 것 | 파일 |
 | --- | --- |
 | 블로그 이름, 소개, GitHub 주소, 이메일 | `src/lib/site.ts` |
-| Resume | `src/data/resume.ts` |
+| Resume (이력서 저장소 `resume.html`과 같은 내용) | `src/data/resume.ts` |
 | Portfolio 프로젝트 개요와 순서 | `src/data/projects.ts` |
 | Portfolio 사례(Case) | `content/portfolio/*.mdx` |
 | 사례 본문 이미지 | `public/portfolio/` |
@@ -97,9 +97,9 @@ order: 2         # 같은 프로젝트 안에서의 순서
 
 본문은 `## 문제 상황`, `## 접근 방식`, `## 해결 및 성과`, `## 참고` 순서로 씁니다. 프로젝트 전체 구조나 회고처럼 이 순서를 따르지 않는 기록도 사례 파일로 둘 수 있습니다. 상세 페이지 설명은 본문의 첫 문단이나 첫 목록에서 가져옵니다. 이미지는 `![설명](/portfolio/파일.png)`로 넣고, 한 문단에 두 장을 붙여 쓰면 나란히 놓입니다.
 
-Resume 불릿을 `{ text: "...", case: "사례 파일 이름" }`으로 쓰면 끝에 그 사례로 가는 "자세히 →" 링크가 붙습니다. `project`나 `case`가 없는 값을 가리키면 빌드가 실패합니다.
+사례의 `project`가 `src/data/projects.ts`에 없는 값을 가리키면 빌드가 실패합니다.
 
-Resume, Portfolio 요약, 사례 상세는 제목 줄 오른쪽 끝의 인쇄 아이콘으로 인쇄 창을 열고 "PDF로 저장"을 고르면 PDF로 받을 수 있습니다. 인쇄할 때는 메뉴, 사이드바, 인쇄 버튼이 빠집니다.
+화면 오른쪽 아래 도구 막대의 인쇄 아이콘으로 인쇄 창을 열고 "PDF로 저장"을 고르면 지금 페이지를 PDF로 받을 수 있습니다. 인쇄할 때는 메뉴, 사이드바, 도구 막대가 빠집니다. Resume는 화면을 그대로 89%로 줄여 찍어서 A4 두 장에 들어가고(본문 10pt), PDF가 화면과 같은 비율로 보입니다(`globals.css`의 인쇄 규칙).
 
 ## 댓글 (giscus)
 

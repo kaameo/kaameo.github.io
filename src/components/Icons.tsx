@@ -67,3 +67,12 @@ export function ChevronIcon({ direction, size = 16 }: { direction: "left" | "rig
     </svg>
   );
 }
+
+// 링크 끝의 작은 화살표. 이력서 저장소 resume.html의 .arrow와 같은 모양이고, 크기는 글자 크기를 따라간다(globals.css .link-arrow).
+export function ArrowIcon() {
+  return (
+    <svg className="link-arrow" viewBox="0 0 10 10" aria-hidden="true">
+      <path d="M3 2h5v5M8 2L2 8" />
+    </svg>
+  );
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import PrintButton from "@/components/PrintButton";
+import ArrowLink from "@/components/ArrowLink";
 import type { Project } from "@/data/projects";
 import { getProjectsWithCases, type Case } from "@/lib/portfolio";
 
@@ -29,20 +29,22 @@ function ProjectCard({ project, cases }: { project: Project; cases: Case[] }) {
             <dd>{project.team}</dd>
           </div>
         )}
-        <div>
-          <dt>역할</dt>
-          <dd>
-            {typeof project.role === "string" ? (
-              project.role
-            ) : (
-              <ul className="pf-role">
-                {project.role.map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
-            )}
-          </dd>
-        </div>
+        {project.role && (
+          <div>
+            <dt>역할</dt>
+            <dd>
+              {typeof project.role === "string" ? (
+                project.role
+              ) : (
+                <ul className="pf-role">
+                  {project.role.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              )}
+            </dd>
+          </div>
+        )}
         <div>
           <dt>기술 스택</dt>
           <dd>{project.tech}</dd>
@@ -52,9 +54,9 @@ function ProjectCard({ project, cases }: { project: Project; cases: Case[] }) {
             <dt>링크</dt>
             <dd className="item-links">
               {project.links.map((link) => (
-                <a key={link.href} href={link.href}>
-                  {link.label} ↗
-                </a>
+                <ArrowLink key={link.href} href={link.href}>
+                  {link.label}
+                </ArrowLink>
               ))}
             </dd>
           </div>
@@ -68,7 +70,7 @@ function ProjectCard({ project, cases }: { project: Project; cases: Case[] }) {
               <Link href={`/portfolio/${c.slug}/`}>
                 {c.title}
                 <span aria-hidden="true" className="arrow">
-                  →
+                  자세히 →
                 </span>
               </Link>
             </li>
@@ -82,10 +84,7 @@ function ProjectCard({ project, cases }: { project: Project; cases: Case[] }) {
 export default function PortfolioPage() {
   return (
     <>
-      <div className="title-row">
-        <h1 className="page-title">Portfolio</h1>
-        <PrintButton />
-      </div>
+      <h1 className="page-title">Portfolio</h1>
 
       {getProjectsWithCases().map(({ project, cases }) => (
         <ProjectCard key={project.slug} project={project} cases={cases} />

@@ -5,6 +5,7 @@ import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import rehypeReact from "rehype-react";
+import ArrowLink from "@/components/ArrowLink";
 import { gfmOptions } from "./markdown-options";
 
 // Resume 데이터(src/data/resume.ts)에 쓴 마크다운 문자열을 React 요소로 바꾼다.
@@ -24,7 +25,8 @@ function processor() {
   return unified().use(remarkParse).use(remarkGfm, gfmOptions).use(remarkRehype);
 }
 
-const toReact = { Fragment: runtime.Fragment, jsx: runtime.jsx, jsxs: runtime.jsxs };
+// 링크 끝에는 resume.html처럼 작은 화살표를 붙인다.
+const toReact = { Fragment: runtime.Fragment, jsx: runtime.jsx, jsxs: runtime.jsxs, components: { a: ArrowLink } };
 
 // 한 줄짜리 마크다운(**굵게**, [링크](url), `코드`)을 감싸는 태그 없이 React 요소로 바꾼다.
 export async function renderInlineMarkdown(markdown: string): Promise<ReactElement> {

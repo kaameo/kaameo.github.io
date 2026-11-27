@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import SiteDock from "@/components/SiteDock";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -31,12 +31,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <Header />
-        <div className="frame">
-          <main className="page">
-            <div className="container">{children}</div>
-          </main>
-          <Footer />
-        </div>
+        <main className="page">
+          <div className="container">{children}</div>
+        </main>
+        <SiteDock />
       </body>
       {site.gaId && <GoogleAnalytics gaId={site.gaId} />}
     </html>

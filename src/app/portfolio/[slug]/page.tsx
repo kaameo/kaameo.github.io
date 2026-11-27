@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import PrintButton from "@/components/PrintButton";
 import { getAllCases, getCase } from "@/lib/portfolio";
 import { loadCaseBody } from "@/lib/mdx";
 
@@ -33,10 +32,7 @@ export default async function CasePage({ params }: { params: Promise<Params> }) 
         <p className="pd-kicker">
           <span className="pd-kicker-project">{project.title}</span> {project.subtitle}
         </p>
-        <div className="pd-title-row">
-          <h1>{item.title}</h1>
-          <PrintButton />
-        </div>
+        <h1>{item.title}</h1>
       </header>
 
       <div className="prose">

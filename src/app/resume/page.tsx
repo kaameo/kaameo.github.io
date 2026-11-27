@@ -1,48 +1,30 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { ReactElement } from "react";
-import PrintButton from "@/components/PrintButton";
-import { resume, type Bullet } from "@/data/resume";
+import { Fragment, type ReactElement } from "react";
+import ArrowLink from "@/components/ArrowLink";
+import { ArrowIcon } from "@/components/Icons";
+import { resume, type Work } from "@/data/resume";
 import { renderInlineMarkdown } from "@/lib/markdown";
-import { getCase } from "@/lib/portfolio";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Resume" };
 
 type Entry = (typeof resume.education)[number];
-type RenderedBullet = { text: ReactElement; caseSlug?: string };
-type RenderedWork = { title: string; stack: string; items: RenderedBullet[] };
+type RenderedWork = Omit<Work, "items"> & { items: ReactElement[] };
 
-// Case가 있는 불릿은 Portfolio 상세 페이지로 잇는다. 없는 Case를 가리키면 빌드를 멈춘다.
-function renderBullets(items: Bullet[]): Promise<RenderedBullet[]> {
-  return Promise.all(
-    items.map(async (item) => {
-      if (typeof item === "string") return { text: await renderInlineMarkdown(item) };
-      if (!getCase(item.case)) throw new Error(`src/data/resume.ts: Case "${item.case}"가 content/portfolio에 없습니다.`);
-      return { text: await renderInlineMarkdown(item.text), caseSlug: item.case };
-    }),
-  );
+function renderBullets(items: string[]): Promise<ReactElement[]> {
+  return Promise.all(items.map(renderInlineMarkdown));
 }
 
-function renderWorks(works: { title: string; stack: string; items: Bullet[] }[]): Promise<RenderedWork[]> {
+function renderWorks(works: Work[]): Promise<RenderedWork[]> {
   return Promise.all(works.map(async (work) => ({ ...work, items: await renderBullets(work.items) })));
 }
 
-function Bullets({ items }: { items: RenderedBullet[] }) {
+function Bullets({ items }: { items: ReactElement[] }) {
   return (
     <ul className="resume-bullets">
       {items.map((item, i) => (
-        <li key={i}>
-          {item.text}
-          {item.caseSlug && (
-            <>
-              {" "}
-              <Link href={`/portfolio/${item.caseSlug}/`} className="case-link no-print">
-                자세히 →
-              </Link>
-            </>
-          )}
-        </li>
+        <li key={i}>{item}</li>
       ))}
     </ul>
   );
@@ -61,15 +43,32 @@ function Works({ works }: { works: RenderedWork[] }) {
   ));
 }
 
-// Experience·Projects 제목. 오른쪽에 자세한 내용은 Portfolio를 보라는 안내를 둔다.
-function PortfolioSectionHead({ title }: { title: string }) {
+// 연락처: 한 줄에 "라벨: 주소"를 //로 나눈다(resume.html의 모양). 주소는 https://와 www.를 떼고 보여 준다.
+const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "");
+const contacts = [
+  { label: "Email", href: `mailto:${site.email}`, text: site.email },
+  { label: "GitHub", href: site.github, text: bare(site.github) },
+  { label: "Blog", href: "/", text: bare(site.url) },
+  { label: "LinkedIn", href: resume.linkedin, text: bare(resume.linkedin) },
+];
+
+function Contact() {
   return (
-    <div className="titled-section-head">
-      <h2>{title}</h2>
-      <p className="title-meta">
-        자세한 내용은 <Link href="/portfolio/">포트폴리오</Link>를 참고해 주세요.
-      </p>
-    </div>
+    <p className="resume-contact">
+      {contacts.map((item, i) => (
+        <Fragment key={item.label}>
+          {i > 0 && (
+            <span className="contact-sep" aria-hidden="true">
+              //
+            </span>
+          )}
+          <span className="contact-item">
+            <b>{item.label}:</b>{" "}
+            {item.href.startsWith("/") ? <Link href={item.href}>{item.text}</Link> : <a href={item.href}>{item.text}</a>}
+          </span>
+        </Fragment>
+      ))}
+    </p>
   );
 }
 
@@ -87,11 +86,6 @@ function Entries({ entries }: { entries: Entry[] }) {
             <span className="period">{entry.period}</span>
           </div>
           {entry.detail && <p className="resume-entry-detail">{entry.detail}</p>}
-          {entry.link && (
-            <p className="resume-entry-detail item-links">
-              <a href={entry.link.href}>{entry.link.label} ↗</a>
-            </p>
-          )}
         </div>
       ))}
     </div>
@@ -117,16 +111,8 @@ export default async function ResumePage() {
     <div className="resume">
       <header className="resume-header">
         <p className="resume-role">{resume.role}</p>
-        <div className="title-row">
-          <h1 className="page-title">{resume.name}</h1>
-          <PrintButton />
-        </div>
-        <div className="resume-contact">
-          <a href={`mailto:${site.email}`}>{site.email}</a>
-          <a href={site.github}>GitHub ↗</a>
-          <a href={resume.linkedin}>LinkedIn ↗</a>
-          <Link href="/posts/">Blog</Link>
-        </div>
+        <h1 className="page-title">{resume.name}</h1>
+        <Contact />
       </header>
 
       <section className="titled-section">
@@ -140,20 +126,24 @@ export default async function ResumePage() {
           {resume.skills.map((row) => (
             <div key={row.group} className="skill-row">
               <span className="skill-group">{row.group}</span>
-              <div className="chips">
-                {row.items.map((item) => (
-                  <span key={item} className="chip">
-                    {item}
-                  </span>
-                ))}
-              </div>
+              <span className="skill-items">{row.items.join(", ")}</span>
             </div>
           ))}
         </div>
       </section>
 
       <section className="titled-section">
-        <PortfolioSectionHead title="Experience" />
+        <div className="titled-section-head">
+          <h2>Experience</h2>
+          <p className="title-meta">
+            자세한 내용은{" "}
+            <Link href="/portfolio/">
+              포트폴리오
+              <ArrowIcon />
+            </Link>
+            를 참고해 주세요.
+          </p>
+        </div>
         {experience.map((job) => (
           <div key={`${job.company} ${job.role}`} className="resume-item">
             <div className="item-head">
@@ -177,7 +167,7 @@ export default async function ResumePage() {
       </section>
 
       <section className="titled-section">
-        <PortfolioSectionHead title="Projects" />
+        <h2>Projects</h2>
         {projects.map((project) => (
           <div key={project.title} className="resume-item resume-project">
             <div className="item-head">
@@ -188,9 +178,9 @@ export default async function ResumePage() {
                 </h3>
                 <span className="item-links">
                   {project.links.map((link) => (
-                    <a key={link.href} href={link.href}>
-                      {link.label} ↗
-                    </a>
+                    <ArrowLink key={link.href} href={link.href}>
+                      {link.label}
+                    </ArrowLink>
                   ))}
                 </span>
               </div>

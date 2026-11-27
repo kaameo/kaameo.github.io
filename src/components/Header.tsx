@@ -2,9 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { site } from "@/lib/site";
-import { GitHubIcon } from "./Icons";
-import ThemeToggle from "./ThemeToggle";
 
 const NAV = [
   { href: "/posts/", label: "Post", match: "/posts" },
@@ -32,12 +29,6 @@ export default function Header() {
             );
           })}
         </nav>
-        <div className="header-actions">
-          <a href={site.github} className="icon-btn" aria-label="GitHub" title="GitHub">
-            <GitHubIcon />
-          </a>
-          <ThemeToggle />
-        </div>
       </div>
     </header>
   );
