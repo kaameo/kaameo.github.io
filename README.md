@@ -79,7 +79,7 @@ import { latency } from "./data";
 | 바꿀 것 | 파일 |
 | --- | --- |
 | 블로그 이름, 소개, GitHub 주소, 이메일 | `src/lib/site.ts` |
-| Resume (이력서 저장소 `resume.html`과 같은 내용) | `src/data/resume.ts` |
+| Resume | `src/data/resume.ts` |
 | Portfolio 프로젝트 개요와 순서 | `src/data/projects.ts` |
 | Portfolio 사례(Case) | `content/portfolio/*.mdx` |
 | 사례 본문 이미지 | `public/portfolio/` |

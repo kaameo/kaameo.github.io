@@ -12,6 +12,7 @@ export const metadata: Metadata = { title: { absolute: `${resume.name} 이력서
 
 type Entry = (typeof resume.education)[number];
 type RenderedWork = Omit<Work, "items"> & { items: ReactElement[] };
+type ItemLink = { label: string; href: string };
 
 function renderBullets(items: string[]): Promise<ReactElement[]> {
   return Promise.all(items.map(renderInlineMarkdown));
@@ -42,6 +43,42 @@ function Works({ works }: { works: RenderedWork[] }) {
       <Bullets items={work.items} />
     </div>
   ));
+}
+
+// Experience의 회사와 Projects의 프로젝트는 같은 모양: 이름 줄(이름, 부제, 링크, 기간) → 한 줄 설명 → 업무 영역.
+function ResumeItem(props: {
+  title: string;
+  subtitle: string;
+  period: string;
+  links?: ItemLink[];
+  description: string;
+  works: RenderedWork[];
+  className?: string;
+}) {
+  return (
+    <div className={props.className ? `resume-item ${props.className}` : "resume-item"}>
+      <div className="item-head">
+        <div className="item-title-line">
+          <h3>
+            {props.title}
+            <span className="item-sub">{props.subtitle}</span>
+          </h3>
+          {props.links && (
+            <span className="item-links">
+              {props.links.map((link) => (
+                <ArrowLink key={link.href} href={link.href}>
+                  {link.label}
+                </ArrowLink>
+              ))}
+            </span>
+          )}
+        </div>
+        <span className="period">{props.period}</span>
+      </div>
+      <blockquote className="resume-intro">{props.description}</blockquote>
+      <Works works={props.works} />
+    </div>
+  );
 }
 
 // 연락처: 두 줄(Email // Blog, GitHub // LinkedIn)에 "라벨: 주소"를 //로 나눈다(resume.html의 모양).
@@ -108,16 +145,11 @@ function Entries({ entries }: { entries: Entry[] }) {
   );
 }
 
-// 경력은 회사·직책 → 제품 → 업무 영역 → 불릿, 프로젝트는 프로젝트 → 업무 영역 → 불릿 순으로 그린다 (src/data/resume.ts 참고).
+// 경력과 프로젝트 모두 이름 줄 → 한 줄 설명 → 업무 영역 → 불릿 순으로 그린다 (src/data/resume.ts 참고).
 export default async function ResumePage() {
   const summary = await renderBullets(resume.summary);
   const experience = await Promise.all(
-    resume.experience.map(async (job) => ({
-      ...job,
-      products: await Promise.all(
-        job.products.map(async (product) => ({ ...product, works: await renderWorks(product.works) })),
-      ),
-    })),
+    resume.experience.map(async (job) => ({ ...job, works: await renderWorks(job.works) })),
   );
   const projects = await Promise.all(
     resume.projects.map(async (project) => ({ ...project, works: await renderWorks(project.works) })),
@@ -161,50 +193,30 @@ export default async function ResumePage() {
           </p>
         </div>
         {experience.map((job) => (
-          <div key={`${job.company} ${job.role}`} className="resume-item">
-            <div className="item-head">
-              <h3>
-                {job.company}
-                <span className="item-sub">{job.role}</span>
-              </h3>
-              <span className="period">{job.period}</span>
-            </div>
-            {job.products.map((product) => (
-              <div key={product.name} className="product">
-                <div className="product-head">
-                  <h4>{product.name}</h4>
-                </div>
-                <blockquote className="resume-intro">{product.description}</blockquote>
-                <Works works={product.works} />
-              </div>
-            ))}
-          </div>
+          <ResumeItem
+            key={`${job.company} ${job.role}`}
+            title={job.company}
+            subtitle={job.role}
+            period={job.period}
+            description={job.description}
+            works={job.works}
+          />
         ))}
       </section>
 
       <section className="titled-section">
         <h2>Projects</h2>
         {projects.map((project) => (
-          <div key={project.title} className="resume-item resume-project">
-            <div className="item-head">
-              <div className="item-title-line">
-                <h3>
-                  {project.title}
-                  <span className="item-sub">{project.subtitle}</span>
-                </h3>
-                <span className="item-links">
-                  {project.links.map((link) => (
-                    <ArrowLink key={link.href} href={link.href}>
-                      {link.label}
-                    </ArrowLink>
-                  ))}
-                </span>
-              </div>
-              <span className="period">{project.period}</span>
-            </div>
-            <blockquote className="resume-intro">{project.description}</blockquote>
-            <Works works={project.works} />
-          </div>
+          <ResumeItem
+            key={project.title}
+            className="resume-project"
+            title={project.title}
+            subtitle={project.subtitle}
+            period={project.period}
+            links={project.links}
+            description={project.description}
+            works={project.works}
+          />
         ))}
       </section>
 

@@ -1,13 +1,14 @@
-// Resume 페이지 내용. 이력서 저장소(resume.html)와 같은 내용을 손으로 맞춘다.
+// Resume 페이지 내용.
 // summary와 불릿(items)은 한 줄 마크다운으로 쓴다: **굵게**, [링크](url), `코드`.
+// 굵게는 결과 수치에만 쓴다(**52%**, **3주 → 1주**). 문제를 설명하는 숫자(81분, 7개 처리 과정)와 문장은 굵게 하지 않는다.
 
 type Link = { label: string; href: string };
 
-// 회사·직책 → 제품 → 업무 영역 → 불릿. 같은 회사에서 직책만 바뀌었으면 Employment 하나에 "인턴 → 연구원"처럼 적는다.
-// 제품과 Project는 이름 아래 한 줄 설명(description)을 두고, 그 아래 업무 영역(works)을 둔다.
+// Employment와 Project는 같은 모양이다: 이름 줄 → 한 줄 설명(description) → 업무 영역(works) → 불릿.
+// Employment의 기간은 재직기간이고, 제품 이름은 description에 쓴다. 같은 회사에서 직책만 바뀌었으면 "인턴 → 연구원"처럼 적는다.
+// 불릿에는 Portfolio 사례 링크를 달지 않는다. 사례 상세로는 Portfolio에서만 간다.
 export type Work = { title: string; stack: string; items: string[] };
-type Product = { name: string; description: string; works: Work[] };
-type Employment = { company: string; role: string; period: string; products: Product[] };
+type Employment = { company: string; role: string; period: string; description: string; works: Work[] };
 
 type Project = { title: string; subtitle: string; period: string; links: Link[]; description: string; works: Work[] };
 
@@ -32,53 +33,36 @@ export const resume: Resume = {
   linkedin: "https://www.linkedin.com/in/jinsu-hong",
 
   summary: [
-    "**Node.js 백엔드와 Go 데이터 수집 플랫폼**을 설계, 구현하고 AWS EKS에서 운영",
-    "Java/Spring 팀 프로젝트에서 **MSA 환경의 서비스 간 HTTP/Kafka 연동 설계, 구현**",
-    "큐 지표와 DB 상태, 실행 로그를 교차 대조해 **에러 로그 없이 발생한 장애의 근본 원인을 추적**",
-    "**변경 가능성을 기준으로 구조를 분리**해, 신규 연동 추가 기간을 기존 약 3주에서 약 1주로 단축",
-    "[**AI 에이전트를 개발과 검증에 활용**](/posts/verifying-ai-agent-work/), 계획 검토 → 테스트 기반 구현 → 코드/문서 대조 사이클로 결과 검증",
+    "Node.js 백엔드와 Go 데이터 수집 플랫폼을 설계, 구현하고 AWS EKS에서 운영",
+    "Java/Spring 팀 프로젝트에서 MSA 환경의 서비스 간 HTTP/Kafka 연동 설계, 구현",
+    "큐 지표와 DB 상태, 실행 로그를 교차 대조해 에러 로그 없이 발생한 장애의 근본 원인을 추적",
+    "변경 가능성을 기준으로 구조를 분리해, 신규 연동 추가 기간을 기존 약 3주에서 약 1주로 단축",
+    "[AI 에이전트를 개발과 검증에 활용](/posts/verifying-ai-agent-work/), 계획 검토 → 테스트 기반 구현 → 코드/문서 대조 사이클로 결과 검증",
   ],
 
   experience: [
     {
-      company: "㈜인브릿지",
-      role: "개발팀 인턴 → 연구원 (Backend Engineer)",
-      period: "(1년 5개월, 인턴 6개월 포함) 2025. 03 - 2026. 07",
-      products: [
+      company: "인브릿지",
+      role: "개발팀 인턴 6개월 → 연구원",
+      period: "2025. 03 - 2026. 07",
+      description:
+        "보안 로그를 수집/분석해 AI 보고서를 만드는 B2B SaaS Sentivex의 수집 플랫폼, 서비스 백엔드, AWS 인프라를 설계, 운영",
+      works: [
         {
-          name: "Sentivex",
-          description: "여러 보안 벤더의 로그를 수집/분석하여 AI 보고서를 생성하는 B2B SaaS",
-          works: [
-            {
-              title: "멀티테넌트 수집 플랫폼 설계, 운영",
-              stack: "Go, PostgreSQL, Redis Streams, Kafka",
-              items: [
-                "글로벌 4개 보안 벤더를 지원하는 멀티테넌트 로그 수집 플랫폼 **0→1 구축**, 신규 벤더 추가 기간을 약 3주 → 1주로 단축",
-                "에러 로그 없이 큐 상한에 밀려 삭제된 **수집 작업 80,375건을 재수집으로 복구**하고 재발 방지",
-                "81분간 진행되는 수집을 10분 만에 타임아웃 처리해 **반복 재수집되던 문제를 heartbeat로 해결**",
-              ],
-            },
-            {
-              title: "서비스 백엔드 설계, 인프라 운영",
-              stack: "NestJS, PostgreSQL, AWS EKS",
-              items: [
-                "**공통 기능과 독립 배포 서비스 분리 설계**, 인증/인가와 테넌트 격리를 NestJS 코어에 통합, 변경이 잦은 수집 플랫폼과 AI 서비스는 분리",
-                "**EKS 월 비용 약 52% 절감**, 8 → 4대로 노드를 줄이고 3AZ 구성 유지",
-              ],
-            },
+          title: "멀티테넌트 수집 플랫폼 설계, 운영",
+          stack: "Go, PostgreSQL, Redis Streams, Kafka",
+          items: [
+            "글로벌 4개 보안 벤더를 지원하는 멀티테넌트 로그 수집 플랫폼 0→1 구축, 신규 벤더 추가 기간을 약 **3주 → 1주**로 단축",
+            "에러 로그 없이 큐 상한에 밀려 삭제된 수집 작업 **80,375건**을 재수집으로 복구하고 재발 방지",
+            "81분간 진행되는 수집을 10분 만에 타임아웃 처리해 반복 재수집되던 문제를 heartbeat로 해결",
           ],
         },
         {
-          name: "Microsoft Teams Add-in",
-          description: "Teams 통화/미팅을 자동 녹취하고 LLM으로 요약하는 서비스",
-          works: [
-            {
-              title: "도메인 모델 재설계",
-              stack: "React, Node.js, Express, PostgreSQL",
-              items: [
-                "'발신자/수신자' 모델을 '사용자/상대방' + '통화 방향' 구조로 재설계, 백엔드와 프론트엔드에 중복된 통화 방향 판별 로직 제거",
-              ],
-            },
+          title: "Sentivex 백엔드 설계, 인프라 운영",
+          stack: "NestJS, PostgreSQL, AWS EKS",
+          items: [
+            "공통 기능과 독립 배포 서비스 분리 설계, 인증/인가와 테넌트 격리를 NestJS 코어에 통합, 변경이 잦은 수집 플랫폼과 AI 서비스는 분리",
+            "EKS 월 비용 약 **52%** 절감, 8 → 4대로 노드를 줄이고 3AZ 구성 유지",
           ],
         },
       ],
@@ -100,10 +84,10 @@ export const resume: Resume = {
           title: "강의 모듈, 서비스 간 연동 설계, 인프라 구축, FE",
           stack: "Java, Spring Boot, PostgreSQL, Kafka, k3s, AWS EC2/S3, React",
           items: [
-            "주문/취소/환불 경쟁별로 **비관적 락, 낙관적 락, 부분 유니크 인덱스를 분리 적용**해 write skew와 중복 구매 차단",
-            "멱등 API 재시도, Kafka 이벤트, 보상 처리로 주문/취소/정산 등 7개 처리 과정의 **공유 트랜잭션 의존 제거**",
-            "고객센터 앱을 GraalVM Native Image로 전환해 **메모리 할당량 43% 절감**, 기동 시간 약 25초 → 1.1초 단축",
-            "S3 직접 업로드 제약을 서버 경유 스트리밍으로 해결, 운영 단일 **2GB 업로드에서 컨테이너 메모리 증가 약 6.7MiB** 확인",
+            "주문/취소/환불 경쟁별로 비관적 락, 낙관적 락, 부분 유니크 인덱스를 분리 적용해 write skew와 중복 구매 차단",
+            "멱등 API 재시도, Kafka 이벤트, 보상 처리로 주문/취소/정산 등 7개 처리 과정의 공유 트랜잭션 의존 제거",
+            "고객센터 앱을 GraalVM Native Image로 전환해 메모리 할당량 **43%** 절감, 기동 시간 약 **25초 → 1.1초** 단축",
+            "S3 직접 업로드 제약을 서버 경유 스트리밍으로 해결, 운영 단일 2GB 업로드에서 컨테이너 메모리 증가 약 **6.7MiB** 확인",
           ],
         },
       ],
@@ -119,8 +103,8 @@ export const resume: Resume = {
           title: "플러그인 단독 설계, 개발",
           stack: "TypeScript, Claude Code Mods",
           items: [
-            "10개가량의 AI 에이전트 질문에 번호를 맞춰 직접 입력하던 방식을 **버튼 선택과 일괄 전송**으로 변경",
-            "병렬 세션을 오갈 때 맥락 파악을 위해 **3턴마다 대화를 fork해 작업 요약**",
+            "10개가량의 AI 에이전트 질문에 번호를 맞춰 직접 입력하던 방식을 버튼 선택과 일괄 전송으로 변경",
+            "병렬 세션을 오갈 때 맥락 파악을 위해 3턴마다 대화를 fork해 작업 요약",
             "합방 프로젝트 팀원 3명에게 공유하고 지속적으로 사용",
           ],
         },
