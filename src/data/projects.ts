@@ -1,7 +1,7 @@
 // Portfolio에 보여 줄 Project. 배열 순서가 요약 페이지와 사이드바의 순서다.
 // content/portfolio/*.mdx Case의 project 값이 여기 slug와 같아야 한다.
 
-type Link = { label: string; href: string };
+export type Link = { label: string; href: string };
 
 // 요약 페이지에서는 이름 줄(이름, 부제, 링크, 기간) 아래에 한 줄 설명(description)만 두고 바로 Case 목록이 온다.
 // description에는 무엇인지와 내가 맡은 것을 함께 쓴다. 기술은 Case 태그가 보여 준다.

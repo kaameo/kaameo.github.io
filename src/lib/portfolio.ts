@@ -2,8 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { projects, type Project } from "@/data/projects";
+import { site } from "@/lib/site";
 
 const PORTFOLIO_DIR = path.join(process.cwd(), "content", "portfolio");
+const DEV = process.env.NODE_ENV === "development";
+
+// Portfolio 요약과 인쇄 전용 페이지의 제목. 인쇄 창에서 "PDF로 저장"하면 파일 이름이 되므로 사이트 이름을 붙이지 않는다.
+export const portfolioTitle = `${site.author} 포트폴리오`;
 
 // 하나의 Project에서 문제 상황 → 접근 방식 → 해결 및 성과로 정리한 기록. 상세 페이지 하나가 Case 하나다.
 // Project 전체 구조나 회고처럼 이 순서를 따르지 않는 기록도 같은 상세 페이지로 둔다.
@@ -62,14 +67,20 @@ function readCase(file: string): Case {
   };
 }
 
-// Project 순서(src/data/projects.ts), 그 안에서는 order 순.
+let cache: Case[] | null = null;
+
+// Project 순서(src/data/projects.ts), 그 안에서는 order 순. 빌드 중에는 한 번만 읽고, 개발 서버에서는 매번 읽어 수정이 바로 보인다.
 export function getAllCases(): Case[] {
-  if (!fs.existsSync(PORTFOLIO_DIR)) return [];
-  return fs
-    .readdirSync(PORTFOLIO_DIR)
-    .filter((f) => f.endsWith(".mdx"))
-    .map(readCase)
-    .sort((a, b) => projects.indexOf(a.project) - projects.indexOf(b.project) || a.order - b.order);
+  if (cache) return cache;
+  const cases = fs.existsSync(PORTFOLIO_DIR)
+    ? fs
+        .readdirSync(PORTFOLIO_DIR)
+        .filter((f) => f.endsWith(".mdx"))
+        .map(readCase)
+        .sort((a, b) => projects.indexOf(a.project) - projects.indexOf(b.project) || a.order - b.order)
+    : [];
+  if (!DEV) cache = cases;
+  return cases;
 }
 
 export function getCase(slug: string): Case | undefined {
@@ -80,9 +91,8 @@ export function getCase(slug: string): Case | undefined {
 export type CaseGroup<T> = { label?: string; cases: T[] };
 
 // Case를 묶음으로 나눈다. 주요 사례(group 없음)가 먼저, 그다음 group이 처음 나온 순서대로. 묶음 안에서는 원래 순서.
-// Portfolio 요약과 사이드바가 같은 묶음을 쓴다.
-export function groupCases<T extends { group?: string }>(cases: T[]): CaseGroup<T>[] {
-  const groups: CaseGroup<T>[] = [];
+function groupCases(cases: Case[]): CaseGroup<Case>[] {
+  const groups: CaseGroup<Case>[] = [];
   for (const item of [...cases.filter((c) => !c.group), ...cases.filter((c) => c.group)]) {
     const group = groups.find((g) => g.label === item.group);
     if (group) group.cases.push(item);
@@ -91,8 +101,13 @@ export function groupCases<T extends { group?: string }>(cases: T[]): CaseGroup<
   return groups;
 }
 
-// Project마다 그 Case 목록. Portfolio 요약과 사이드바가 같은 순서를 쓴다.
-export function getProjectsWithCases(): { project: Project; cases: Case[] }[] {
+// Portfolio의 읽는 순서: Project마다 Case 묶음. 요약, 사이드바, 인쇄 전용 페이지가 모두 이 순서를 쓴다.
+export function getPortfolio(): { project: Project; groups: CaseGroup<Case>[] }[] {
   const cases = getAllCases();
-  return projects.map((project) => ({ project, cases: cases.filter((c) => c.project === project) }));
+  return projects.map((project) => ({ project, groups: groupCases(cases.filter((c) => c.project === project)) }));
+}
+
+// 요약과 같은 순서로 펼친 모든 Case(인쇄 전용 페이지에서 Case 전문을 이어 붙이는 순서).
+export function getCasesInReadingOrder(): Case[] {
+  return getPortfolio().flatMap(({ groups }) => groups.flatMap((group) => group.cases));
 }

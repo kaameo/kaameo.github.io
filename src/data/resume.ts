@@ -3,32 +3,45 @@
 // 굵게는 결과 수치에만 쓴다(**52%**, **3주 → 1주**). 문제를 설명하는 숫자(81분, 7개 처리 과정)와 문장은 굵게 하지 않는다.
 // 불릿은 결과 중심(무엇을 해서 어떤 수치)으로 쓴다. 같은 일을 Portfolio 사례 highlights에서는 "문제 → 결과"로 짧게 써서 같은 문장이 두 번 나오지 않게 한다.
 
-type Link = { label: string; href: string };
+import { projects as portfolioProjects, type Link } from "@/data/projects";
+import { site } from "@/lib/site";
 
-// Employment와 Project는 같은 모양이다: 이름 줄 → 한 줄 설명(description) → 업무 영역(works) → 불릿.
-// Employment의 기간은 재직기간이고, 제품 이름은 description에 쓴다. 같은 회사에서 직책만 바뀌었으면 "인턴 → 연구원"처럼 적는다.
+// Experience의 회사(Employment)와 Projects의 프로젝트는 같은 모양이다: 이름 줄(title, subtitle, links, period) → 한 줄 설명(description) → 업무 영역(works) → 불릿.
+// 회사의 subtitle은 직책, period는 재직기간이고, 제품 이름은 description에 쓴다. 같은 회사에서 직책만 바뀌었으면 "인턴 → 연구원"처럼 적는다.
 // 불릿에는 Portfolio 사례 링크를 달지 않는다. 사례 상세로는 Portfolio에서만 간다.
 export type Work = { title: string; stack: string; items: string[] };
-type Employment = { company: string; role: string; period: string; description: string; works: Work[] };
-
-type Project = { title: string; subtitle: string; period: string; links: Link[]; description: string; works: Work[] };
+export type ResumeEntry = {
+  title: string;
+  subtitle: string;
+  period: string;
+  links?: Link[];
+  description: string;
+  works: Work[];
+};
 
 // 학교, 교육과정, 자격증처럼 이름·기간만 있는 항목.
-type Entry = { name: string; subtitle: string; period: string; detail?: string };
+export type Entry = { name: string; subtitle: string; period: string; detail?: string };
+
+// Projects의 이름 줄(이름, 부제, 기간, 링크)은 Portfolio의 같은 Project(src/data/projects.ts)에서 가져온다. 두 곳을 따로 고치지 않게 한다.
+function portfolioHead(slug: string): Pick<ResumeEntry, "title" | "subtitle" | "period" | "links"> {
+  const project = portfolioProjects.find((p) => p.slug === slug);
+  if (!project) throw new Error(`src/data/resume.ts: Project "${slug}"가 src/data/projects.ts에 없습니다.`);
+  return { title: project.title, subtitle: project.subtitle, period: project.period, links: project.links };
+}
 
 type Resume = {
   name: string;
   role: string;
   summary: string[];
-  experience: Employment[];
-  projects: Project[];
+  experience: ResumeEntry[];
+  projects: ResumeEntry[];
   skills: { group: string; items: string[] }[];
   education: Entry[];
   training: Entry[];
 };
 
 export const resume: Resume = {
-  name: "홍진수",
+  name: site.author,
   role: "Backend Engineer",
 
   summary: [
@@ -41,8 +54,8 @@ export const resume: Resume = {
 
   experience: [
     {
-      company: "인브릿지",
-      role: "개발팀 인턴 6개월 → 연구원",
+      title: "인브릿지",
+      subtitle: "개발팀 인턴 6개월 → 연구원",
       period: "2025. 03 - 2026. 07",
       description:
         "보안 로그를 수집/분석해 AI 보고서를 만드는 B2B SaaS Sentivex의 수집 플랫폼, 서비스 백엔드, AWS 인프라를 설계, 운영",
@@ -70,13 +83,7 @@ export const resume: Resume = {
 
   projects: [
     {
-      title: "합방",
-      subtitle: "K-Digital Training 5인 팀 프로젝트, 우수상",
-      period: "2026. 10 - 2026. 11",
-      links: [
-        { label: "서비스", href: "https://hapbang.duckdns.org/" },
-        { label: "GitHub", href: "https://github.com/prgrms-be-adv-devcourse/beadv8_8_LMS_BE/" },
-      ],
+      ...portfolioHead("hapbang"),
       description: "인플루언서 합동 방송(합방) 섭외와 강의 판매를 포인트로 거래하는 플랫폼",
       works: [
         {
@@ -92,10 +99,7 @@ export const resume: Resume = {
       ],
     },
     {
-      title: "Sidecar",
-      subtitle: "개인 오픈소스 프로젝트",
-      period: "2026. 10 - now",
-      links: [{ label: "GitHub", href: "https://github.com/kaameo-lab/sidecar" }],
+      ...portfolioHead("sidecar"),
       description: "Claude Code 패널에서 AI 에이전트의 질문에 버튼으로 답하고, 세션 요약을 보여 주는 플러그인",
       works: [
         {
