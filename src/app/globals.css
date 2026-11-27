@@ -245,9 +245,10 @@ img {
   color: var(--fg);
 }
 
-/* Resume·Portfolio의 기간. resume.html처럼 본문 글꼴에 회색. */
+/* Resume·Portfolio의 기간(Case 상세 머리 포함). 블로그 날짜처럼 회색 고정폭 글씨. */
 .period {
-  font-size: 14px;
+  font-family: var(--font-mono);
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -858,13 +859,27 @@ img {
   color: var(--muted);
 }
 
-/* 이름 아래 가로줄(resume.html의 name-rule) */
-.resume-header .page-title {
+/* 이름 줄: 이름은 왼쪽, 문서 종류(Portfolio의 "포트폴리오")는 오른쪽 끝. 아래 가로줄은 resume.html의 name-rule. */
+.profile-name-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--line);
 }
 
-/* 연락처 두 줄: 굵은 라벨, 주소, //. 위 간격은 헤더 gap(8px)과 더해 resume.html의 18px. */
+/* portfolio.html의 .doc-type: 굵게, 넓은 자간. 자간이 마지막 글자 뒤에도 붙으므로 그만큼 오른쪽으로 당겨 끝을 가로줄 끝에 맞춘다. */
+.profile-doc-type {
+  margin-right: -0.3em;
+  padding-bottom: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  white-space: nowrap;
+}
+
+/* 연락처 한 줄(Email // GitHub // Blog): 굵은 라벨, 주소, //. 위 간격은 헤더 gap(8px)과 더해 resume.html의 18px. */
 .resume-contact {
   margin-top: 10px;
   font-size: 15px;
@@ -994,8 +1009,9 @@ img {
   font-weight: 600;
 }
 
-/* Resume의 회사·프로젝트 이름은 아래 업무 제목(16px 반굵게)보다 확실히 크고 굵게 둬서 먼저 눈에 들어오게 한다. */
-.resume-item > .item-head h3 {
+/* Resume의 회사·프로젝트 이름과 Portfolio의 Project 이름은 아래 업무·Case 제목(16px 반굵게)보다 확실히 크고 굵게 둬서 먼저 눈에 들어오게 한다. */
+.resume-item > .item-head h3,
+.pf-project > .item-head h2 {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -1056,18 +1072,16 @@ img {
 }
 
 /* 불릿 기호는 resume.html처럼 작은 회색 •, 들여쓰기는 글자 크기를 따라간다.
-   Resume 불릿과 Portfolio의 역할 목록, Case 핵심 성과가 같은 모양을 쓴다. */
+   Resume 불릿과 Case 핵심 성과(요약·상세)가 같은 모양을 쓴다. */
 .resume-bullets li,
-.pf-role li,
-.pf-highlights li,
+.pf-cases > li,
 .pd-highlights li {
   position: relative;
   padding-left: 0.85em;
 }
 
 .resume-bullets li::before,
-.pf-role li::before,
-.pf-highlights li::before,
+.pf-cases > li::before,
 .pd-highlights li::before {
   content: "•";
   position: absolute;
@@ -1075,7 +1089,7 @@ img {
   color: var(--muted);
 }
 
-/* 회사·프로젝트 이름 아래 한 줄 설명. 강조색 세로선으로 아래 불릿과 구별한다. */
+/* 회사·프로젝트 이름 아래 한 줄 설명(Resume와 Portfolio 요약). 강조색 세로선으로 아래 불릿·Case 목록과 구별한다. */
 .resume-intro {
   margin: 6px 0 0;
   padding-left: 12px;
@@ -1121,7 +1135,7 @@ img {
 }
 
 /* ---------- Portfolio ---------- */
-/* Portfolio 사이드바: 요약과 Case 상세에 함께 붙는다(portfolio/layout.tsx).
+/* Portfolio 사이드바: 요약과 Case 상세에 함께 붙는다(portfolio/(browse)/layout.tsx). 인쇄 전용 페이지에는 없다.
    본문(--max)은 다른 페이지처럼 가운데에 두고, 사이드바 영역(--aside: 목록 + --aside-gap + 세로선 + --aside-gap)을 본문 바로 왼쪽에 붙인다.
    화면이 넓어지면 그 왼쪽이 비고, 좁으면 왼쪽 여백(--gutter)을 지키려고 목록이 줄어든다.
    .page(main)를 기준으로 놓아서 세로선이 헤더 아래부터 페이지 끝까지 이어지고, 50%는 화면 가운데다. */
@@ -1153,11 +1167,20 @@ img {
   list-style: none;
 }
 
-/* 목록은 sticky로 따라오고, 길면 세로로만 스크롤한다. overflow-y만 주면 가로도 스크롤할 수 있게 되므로 가로는 막는다. */
-.pf-nav {
+/* 목록과 그 아래 PDF 링크를 함께 sticky로 따라오게 한다. 목록이 길면 목록만 세로로 스크롤하고, PDF 링크는 목록 밖이라 같이 움직이지 않는다.
+   overflow-y만 주면 가로도 스크롤할 수 있게 되므로 가로는 막는다. */
+.pf-sidebar-inner {
   position: sticky;
   top: 24px;
   max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pf-nav {
+  flex: 0 1 auto;
+  min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -1166,6 +1189,20 @@ img {
   flex-direction: column;
   gap: 14px;
   font-size: 14px;
+}
+
+/* 인쇄 전용 페이지로 가는 링크. 목록 아래 가는 선 밑에 둔다. */
+.pf-sidebar-print {
+  flex: none;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.pf-sidebar-print:hover {
+  color: var(--fg);
 }
 
 .pf-nav a {
@@ -1213,45 +1250,30 @@ img {
   font-weight: 600;
 }
 
-/* Portfolio 요약: 제목 아래 Project를 차례로 나열한다. Project마다 개요와 Case 제목 불릿을 두고, Case 하나가 상세 페이지 하나다.
-   이름·기간 줄은 Resume와 같은 .item-head를 쓰고, Project마다 위에 가는 선을 긋는다. */
+/* 인쇄 전용 Portfolio(/portfolio/print/): 요약 뒤에 Case 전문을 이어 붙인다. 화면에서는 Case 사이를 선으로 나누고, 인쇄에서는 Case마다 새 쪽. */
+.pf-print-note {
+  margin: 0 0 32px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.pf-print-case {
+  margin-top: 72px;
+  padding-top: 56px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 24px;
+}
+
+/* Portfolio 요약: 제목 아래 Project를 차례로 나열한다. Project마다 이름 줄, 한 줄 설명, Case 목록을 두고, Case 하나가 상세 페이지 하나다.
+   이름 줄과 한 줄 설명은 Resume와 같은 .item-head, .resume-intro를 쓰고, Project마다 위에 가는 선을 긋는다. */
 .pf-project {
   margin-top: 40px;
   padding-top: 40px;
   border-top: 1px solid var(--line);
   scroll-margin-top: 24px;
-}
-
-.pf-overview {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 14px 0 0;
-  font-size: 15px;
-}
-
-.pf-overview > div {
-  display: grid;
-  grid-template-columns: 80px minmax(0, 1fr);
-  gap: 12px;
-}
-
-.pf-overview dt {
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.pf-overview dd {
-  margin: 0;
-}
-
-.pf-role {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 
 /* Case 목록. 묶음(주요 사례, 기타 등)마다 하나이고, group이 있는 묶음은 위에 작은 제목을 둔다. */
@@ -1267,61 +1289,61 @@ img {
   color: var(--muted);
 }
 
+/* Case 목록은 라벨형 불릿: "• 굵은 Case 제목: 핵심 성과". 줄 전체가 Case 링크이고 →는 오른쪽 끝.
+   Case 사이는 선 없이 간격으로만 나누고, 가로선은 Project 사이에만 둔다. */
 .pf-cases {
   margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
   font-size: 15px;
 }
 
-/* Case 제목 옆의 기술·주제 태그 */
-.pf-case-tags {
-  margin-left: 10px;
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--muted);
-}
-
-/* Case의 핵심 성과 한두 줄: 요약 페이지 Case 제목 아래(.pf-highlights)와 상세 페이지 제목 아래(.pd-highlights) */
-.pf-highlights,
-.pd-highlights {
-  margin: 4px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pd-highlights {
-  font-size: 17px;
-}
-
-/* Case 제목은 왼쪽, "자세히 →"는 오른쪽 끝. 제목이 길어 접히면 "자세히 →"는 첫 줄 높이에 있다. */
 .pf-cases a {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 16px;
+}
+
+.pf-case-label {
   font-weight: 600;
   transition: color 0.15s ease;
 }
 
-.pf-cases a:hover {
+.pf-cases a:hover .pf-case-label {
   color: var(--accent);
 }
 
 .pf-case-more {
   display: inline-block;
   flex: none;
-  color: var(--accent);
-  font-size: 14px;
-  font-weight: 400;
-  transition: transform 0.15s ease;
+  color: var(--muted);
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
 }
 
 .pf-cases a:hover .pf-case-more {
+  color: var(--accent);
   transform: translateX(3px);
+}
+
+/* Case 상세 제목 아래 핵심 성과. 제목은 짧은 주제 이름이고, 무엇을 어떻게 해서 어떤 결과를 냈는지는 이 불릿이 맡는다. */
+.pd-highlights {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 17px;
+}
+
+/* Case 상세 머리 끝의 기술·주제 태그 */
+.pd-tags {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
 }
 
 .pd-header {
@@ -1333,7 +1355,7 @@ img {
   border-bottom: 1px solid var(--line);
 }
 
-/* 어느 Project의 Case인지와 기간. Resume·Portfolio의 기간처럼 본문 글꼴에 회색. */
+/* 어느 Project의 Case인지, 기간(.period, 고정폭), 내 역할. 회색. */
 .pd-kicker {
   margin: 0;
   font-size: 14px;
@@ -1590,7 +1612,8 @@ img {
     font-size: 26px;
   }
 
-  .resume-item > .item-head h3 {
+  .resume-item > .item-head h3,
+  .pf-project > .item-head h2 {
     font-size: 18px;
   }
 
@@ -1611,11 +1634,6 @@ img {
 
   .contact-sep {
     display: none;
-  }
-
-  .pf-overview > div {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
   }
 
   .prose p:has(> img + img) {
@@ -1683,5 +1701,29 @@ img {
      크기·간격을 인쇄에서 따로 바꾸지 않아야 PDF가 화면과 같은 비율로 보인다. */
   .resume {
     zoom: 0.89;
+  }
+
+  /* Portfolio 요약은 포트폴리오 첫 장(머리 + 목차)이 된다. Resume와 같은 비율로 줄이고, Case가 쪽 경계에서 잘리지 않게 한다.
+     PDF에서도 Case와 Resume로 가는 링크를 누를 수 있어야 하므로 →와 Resume 링크는 인쇄에도 남긴다. */
+  .pf-summary,
+  .pf-print {
+    zoom: 0.89;
+  }
+
+  .pf-cases > li {
+    break-inside: avoid;
+  }
+
+  /* 본문 소제목이 쪽 끝에 홀로 남지 않게 다음 내용과 붙인다(Case 상세와 인쇄 전용 페이지). */
+  .prose h2,
+  .prose h3 {
+    break-after: avoid;
+  }
+
+  .pf-print-case {
+    break-before: page;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
   }
 }

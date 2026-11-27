@@ -9,12 +9,16 @@ const PORTFOLIO_DIR = path.join(process.cwd(), "content", "portfolio");
 // Project 전체 구조나 회고처럼 이 순서를 따르지 않는 기록도 같은 상세 페이지로 둔다.
 export type Case = {
   slug: string;
+  // 짧은 주제 이름(예: "EKS 클러스터 재설계"). 요약 목록, 사이드바, 상세 페이지 제목이 같은 이름을 쓴다. 결과는 highlights에 쓴다.
   title: string;
   project: Project;
   order: number;
-  // 기술·주제 태그. 요약 페이지에서 Case 제목 옆에 둔다.
+  // 기술·주제 태그. Case 상세 머리에 둔다.
   tags: string[];
-  // 핵심 성과 한두 줄(한 줄 마크다운). 요약 페이지 Case 제목 아래와 상세 페이지 제목 아래에 둔다.
+  // 이 Case에서 내가 맡은 범위(예: "단독 설계·구현", "팀 내 담당"). 상세 페이지 머리 위 줄에 기간 다음으로 둔다. 없으면 두지 않는다.
+  role?: string;
+  // "문제 → 결과"를 짧게 쓴 한두 문장(한 줄 마크다운, 굵게는 결과 수치에만, 링크 없이). Resume 불릿(결과 중심)과 같은 문장을 피한다.
+  // 요약 페이지에서는 "제목: 성과" 한 줄, 상세 페이지에서는 제목 아래 불릿.
   highlights: string[];
   // 문제 상황 → 접근 방식 → 해결 및 성과 순서가 아닌 기록(전체 구조, 회고)을 따로 묶는 작은 제목. 없으면 주요 사례다.
   group?: string;
@@ -51,6 +55,7 @@ function readCase(file: string): Case {
     project,
     order: Number(data.order ?? 0),
     tags: strings(data.tags),
+    role: data.role ? String(data.role) : undefined,
     highlights: strings(data.highlights),
     group: data.group ? String(data.group) : undefined,
     summary: firstParagraph(content),

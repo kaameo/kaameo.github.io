@@ -1,6 +1,7 @@
 // Resume 페이지 내용.
 // summary와 불릿(items)은 한 줄 마크다운으로 쓴다: **굵게**, [링크](url), `코드`.
 // 굵게는 결과 수치에만 쓴다(**52%**, **3주 → 1주**). 문제를 설명하는 숫자(81분, 7개 처리 과정)와 문장은 굵게 하지 않는다.
+// 불릿은 결과 중심(무엇을 해서 어떤 수치)으로 쓴다. 같은 일을 Portfolio 사례 highlights에서는 "문제 → 결과"로 짧게 써서 같은 문장이 두 번 나오지 않게 한다.
 
 type Link = { label: string; href: string };
 
@@ -18,7 +19,6 @@ type Entry = { name: string; subtitle: string; period: string; detail?: string }
 type Resume = {
   name: string;
   role: string;
-  linkedin: string;
   summary: string[];
   experience: Employment[];
   projects: Project[];
@@ -30,12 +30,11 @@ type Resume = {
 export const resume: Resume = {
   name: "홍진수",
   role: "Backend Engineer",
-  linkedin: "https://www.linkedin.com/in/jinsu-hong",
 
   summary: [
     "Node.js 백엔드와 Go 데이터 수집 플랫폼을 설계, 구현하고 AWS EKS에서 운영",
     "Java/Spring 팀 프로젝트에서 MSA 환경의 서비스 간 HTTP/Kafka 연동 설계, 구현",
-    "큐 지표와 DB 상태, 실행 로그를 교차 대조해 에러 로그 없이 발생한 장애의 근본 원인을 추적",
+    "에러 로그 없이 발생한 장애를 큐 지표와 DB 상태, 실행 로그를 교차 대조해 근본 원인을 추적",
     "변경 가능성을 기준으로 구조를 분리해, 신규 연동 추가 기간을 기존 약 3주에서 약 1주로 단축",
     "[AI 에이전트를 개발과 검증에 활용](/posts/verifying-ai-agent-work/), 계획 검토 → 테스트 기반 구현 → 코드/문서 대조 사이클로 결과 검증",
   ],

@@ -85,21 +85,22 @@ import { latency } from "./data";
 | 사례 본문 이미지 | `public/portfolio/` |
 | Home 프로필 사진 | `public/profile.jpg` 파일을 넣으면 자동으로 보입니다 |
 
-사례 파일 하나가 Portfolio 상세 페이지 하나입니다. Portfolio 요약과 사례 상세에는 모든 사례가 담긴 사이드바가 붙습니다(`src/app/portfolio/layout.tsx`). frontmatter는 다음과 같이 씁니다.
+사례 파일 하나가 Portfolio 상세 페이지 하나입니다. Portfolio 요약과 사례 상세에는 모든 사례가 담긴 사이드바가 붙습니다(`src/app/portfolio/(browse)/layout.tsx`). 요약과 모든 사례를 PDF 한 벌로 받으려면 인쇄 전용 페이지 `/portfolio/print/`를 인쇄합니다. frontmatter는 다음과 같이 씁니다.
 
 ```yaml
 ---
-title: "GraalVM Native Image로 고객센터 앱 메모리 할당량 43% 절감"
+title: "GraalVM Native Image 전환" # 짧은 주제 이름. 요약 목록, 사이드바, 상세 페이지 제목에 같이 쓴다
 project: hapbang # src/data/projects.ts의 slug
 order: 2         # 같은 프로젝트 안에서의 순서
-tags: ["GraalVM Native Image", "k3s", "EC2"] # Portfolio 요약에서 제목 옆에 보이는 태그
-highlights:      # 핵심 성과 한두 줄(한 줄 마크다운). Portfolio 요약 제목 아래와 상세 페이지 제목 아래에 보인다
-  - "고객센터 앱을 GraalVM Native Image로 전환해 **메모리 할당량 43% 절감**"
+role: "팀 내 담당" # 이 사례에서 내가 맡은 범위. 상세 페이지 제목 위 줄에 기간 다음으로 보인다
+tags: ["GraalVM Native Image", "k3s", "EC2"] # 사례 상세 머리에 보이는 태그
+highlights:      # "문제 → 결과"를 짧게 쓴 한두 문장(한 줄 마크다운, 링크 없이). Resume 불릿(결과 중심)과 같은 문장을 피한다. Portfolio 요약에서는 "제목: 성과" 한 줄로, 상세 페이지에서는 제목 아래 불릿으로 보인다
+  - "고객센터 앱 메모리 할당량 **43%** 절감, 기동 시간 약 **25초 → 1.1초** 단축" # 굵게는 결과 수치에만
 group: "기타"    # 문제 상황 → 해결 순서가 아닌 기록(전체 구조, 회고)만. 요약과 사이드바에서 주요 사례 아래 따로 묶인다
 ---
 ```
 
-`tags`, `highlights`, `group`은 없어도 됩니다.
+`role`, `tags`, `highlights`, `group`은 없어도 됩니다.
 
 본문은 `## 문제 상황`, `## 접근 방식`, `## 해결 및 성과`, `## 참고` 순서로 씁니다. 프로젝트 전체 구조나 회고처럼 이 순서를 따르지 않는 기록도 사례 파일로 둘 수 있습니다. 상세 페이지 설명은 본문의 첫 문단이나 첫 목록에서 가져옵니다. 이미지는 `![설명](/portfolio/파일.png)`로 넣고, 한 문단에 두 장을 붙여 쓰면 나란히 놓입니다.
 

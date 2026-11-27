@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Fragment, type ReactElement } from "react";
+import type { ReactElement } from "react";
 import ArrowLink from "@/components/ArrowLink";
 import { ArrowIcon } from "@/components/Icons";
+import ProfileHeader from "@/components/ProfileHeader";
 import { resume, type Work } from "@/data/resume";
 import { renderInlineMarkdown } from "@/lib/markdown";
-import { site } from "@/lib/site";
 
 // 인쇄 창에서 "PDF로 저장"하면 페이지 제목이 파일 이름이 되므로 사이트 이름을 붙이지 않는다.
 export const metadata: Metadata = { title: { absolute: `${resume.name} 이력서` } };
@@ -81,50 +81,6 @@ function ResumeItem(props: {
   );
 }
 
-// 연락처: 두 줄(Email // Blog, GitHub // LinkedIn)에 "라벨: 주소"를 //로 나눈다(resume.html의 모양).
-// 주소는 https://와 www.를 떼고 보여 준다. Email은 링크 없이 글자만 둔다.
-type ContactItem = { label: string; text: string; href?: string };
-const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "");
-const contactLines: ContactItem[][] = [
-  [
-    { label: "Email", text: site.email },
-    { label: "Blog", href: "/", text: bare(site.url) },
-  ],
-  [
-    { label: "GitHub", href: site.github, text: bare(site.github) },
-    { label: "LinkedIn", href: resume.linkedin, text: bare(resume.linkedin) },
-  ],
-];
-
-function ContactValue({ item }: { item: ContactItem }) {
-  if (!item.href) return item.text;
-  return item.href.startsWith("/") ? <Link href={item.href}>{item.text}</Link> : <a href={item.href}>{item.text}</a>;
-}
-
-function Contact() {
-  return (
-    <div className="resume-contact">
-      {contactLines.map((line) => (
-        <p key={line[0].label}>
-          {line.map((item, i) => (
-            <Fragment key={item.label}>
-              {i > 0 && (
-                <span className="contact-sep" aria-hidden="true">
-                  //
-                </span>
-              )}
-              <span className="contact-item">
-                <b>{item.label}:</b>{" "}
-                <ContactValue item={item} />
-              </span>
-            </Fragment>
-          ))}
-        </p>
-      ))}
-    </div>
-  );
-}
-
 // 학교, 교육과정, 자격증: 이름은 왼쪽, 기간은 오른쪽, 필요하면 아래에 한 줄 더.
 function Entries({ entries }: { entries: Entry[] }) {
   return (
@@ -157,11 +113,7 @@ export default async function ResumePage() {
 
   return (
     <div className="resume">
-      <header className="resume-header">
-        <p className="resume-role">{resume.role}</p>
-        <h1 className="page-title">{resume.name}</h1>
-        <Contact />
-      </header>
+      <ProfileHeader />
 
       <section className="titled-section">
         <h2>Summary</h2>

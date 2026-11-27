@@ -16,34 +16,40 @@ export default function PortfolioNav({ projects }: { projects: NavProject[] }) {
 
   return (
     <aside className="pf-sidebar no-print" aria-label="포트폴리오 목차">
-      <ul className="pf-nav">
-        <li>
-          <Link href="/portfolio/" className="pf-nav-home" aria-current={current()}>
-            Portfolio
-          </Link>
-        </li>
-        {projects.map((project) => (
-          <li key={project.slug}>
-            <Link href={`/portfolio/#${project.slug}`} className="pf-nav-project">
-              {project.title}
+      <div className="pf-sidebar-inner">
+        <ul className="pf-nav">
+          <li>
+            <Link href="/portfolio/" className="pf-nav-home" aria-current={current()}>
+              Portfolio
             </Link>
-            <ul>
-              {project.groups.map((group) => (
-                <Fragment key={group.label ?? ""}>
-                  {group.label && <li className="pf-nav-group">{group.label}</li>}
-                  {group.cases.map((c) => (
-                    <li key={c.slug}>
-                      <Link href={`/portfolio/${c.slug}/`} className="pf-nav-case" aria-current={current(c.slug)}>
-                        {c.title}
-                      </Link>
-                    </li>
-                  ))}
-                </Fragment>
-              ))}
-            </ul>
           </li>
-        ))}
-      </ul>
+          {projects.map((project) => (
+            <li key={project.slug}>
+              <Link href={`/portfolio/#${project.slug}`} className="pf-nav-project">
+                {project.title}
+              </Link>
+              <ul>
+                {project.groups.map((group) => (
+                  <Fragment key={group.label ?? ""}>
+                    {group.label && <li className="pf-nav-group">{group.label}</li>}
+                    {group.cases.map((c) => (
+                      <li key={c.slug}>
+                        <Link href={`/portfolio/${c.slug}/`} className="pf-nav-case" aria-current={current(c.slug)}>
+                          {c.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </Fragment>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+        {/* 목록이 길어 스크롤돼도 같이 움직이지 않도록 스크롤되는 목록(.pf-nav) 밖에 둔다. */}
+        <Link href="/portfolio/print/" className="pf-sidebar-print">
+          PDF용 전체 페이지 →
+        </Link>
+      </div>
     </aside>
   );
 }
