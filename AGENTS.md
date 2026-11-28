@@ -29,6 +29,7 @@ Single-context: `docs/GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.
 - 본문 import 경로는 `src/lib/mdx.ts`에 글자 그대로 적는다(Turbopack은 변수로 만든 경로를 처리하지 못한다). 목록·RSS가 쓰는 `posts.ts` 등에는 넣지 않는다.
 - `draft: true`인 글도 빌드 때 컴파일된다. 초안의 MDX 문법 오류는 배포 빌드를 멈추고, 초안 폴더의 `"use client"` 코드는 정적 JS에 들어간다.
 - MDX에서 코드 밖의 `<글자`(예: `Map<String>`)와 `{`는 JSX로 읽힌다. 백틱으로 감싼다.
+- 글 안 컴포넌트·카드·상자에 왼쪽 강조선(accent bar, `border-left`)을 쓰지 않는다. 강조나 구분은 균일한 1px 테두리(`var(--line)`), 배경색(`var(--code)`), 배지로 표현한다.
 
 ## 확인 방법
 
